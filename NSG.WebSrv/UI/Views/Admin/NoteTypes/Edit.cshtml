@@ -1,0 +1,55 @@
+﻿@model NSG.WebSrv.Application.Commands.NoteTypes.NoteTypeDetailQuery
+@{
+    ViewData["Title"] = "Edit";
+    // GetClientScriptList is in  ViewHelpers folder
+    SelectListItem[] clientScriptList = Helpers.GetClientScriptList();
+}
+<h2>NoteType (Edit)</h2>
+<hr />
+<div class="container">
+    <form asp-controller="NoteTypes" asp-action="Edit" asp-route-model="@Model">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    <a asp-action="Index">Back to List</a>
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <input type="hidden" asp-for="NoteTypeId" />
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NoteTypeId">Id:</label>
+            <div class="col-md-9">
+                @Html.DisplayFor(model => model.NoteTypeId)
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NoteTypeShortDesc">Short Desc:</label>
+            <div class="col-md-9">
+                <input asp-for="NoteTypeShortDesc" class="form-control" maxlength="8" size="9" style="width: 120px;" />
+                <span asp-validation-for="NoteTypeShortDesc" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NoteTypeDesc">Description:</label>
+            <div class="col-md-9">
+                <input asp-for="NoteTypeDesc" class="form-control" maxlength="50" size="51" style="width: 400px;" />
+                <span asp-validation-for="NoteTypeDesc" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NoteTypeClientScript">Client Script:</label>
+            <div class="col-md-9">
+                <select asp-for="NoteTypeClientScript" asp-items="@clientScriptList" style="height: 35px;"></select>
+                <span asp-validation-for="NoteTypeClientScript" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

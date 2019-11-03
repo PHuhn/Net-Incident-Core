@@ -1,0 +1,24 @@
+﻿@model NSG.WebSrv.Application.Commands.IncidentTypes.IncidentTypeDetailQuery
+@{
+    ViewData["Title"] = "Details";
+}
+<h2>Incident Type/E-Mail Templete (Details)</h2>
+<div class="container">
+    <hr />
+    <div class="form-actions no-color">
+        <div class="nsg-float-left text-left">
+            <span>
+                <a asp-action="Index">Back to List</a>
+            </span>
+        </div>
+        <div class="nsg-float-right text-right">
+            <span>
+                <a asp-action="Edit" asp-route-id="@Model.IncidentTypeId">Edit</a>
+            </span>
+        </div>
+        <div class="nsg-clear-both"></div>
+    </div>
+
+    @await Html.PartialAsync("IncidentTypeDetailPartial", @Model)
+
+</div>

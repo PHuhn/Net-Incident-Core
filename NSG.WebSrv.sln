@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.645
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.MimeKit.Extensions", "..\..\Ng\NSG.MimeKit\NSG.MimeKit.Extensions\NSG.MimeKit.Extensions.csproj", "{5AD3CA6D-9091-4D3F-B6C1-E70EC4E4B831}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.WebSrv_Tests", "NSG.WebSrv_Tests\NSG.WebSrv_Tests.csproj", "{85FC682D-8592-451D-9A0B-00D3344FB9F3}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.WebSrv", "NSG.WebSrv\NSG.WebSrv.csproj", "{BCFDD09F-8928-4E80-A804-82728C9BBE16}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSG.Library.Helpers", "..\..\Ng\NSG.Library\NSG.Library.Helpers\NSG.Library.Helpers.csproj", "{824450DC-66C8-474A-AFF7-FD7ADC1D684C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.PrimeNG.LazyLoading", "..\..\Ng\NSG.PrimeNG\NSG.PrimeNG.LazyLoading\NSG.PrimeNG.LazyLoading.csproj", "{747064F6-BD20-40EB-88B5-3B0F08A83725}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5AD3CA6D-9091-4D3F-B6C1-E70EC4E4B831}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5AD3CA6D-9091-4D3F-B6C1-E70EC4E4B831}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5AD3CA6D-9091-4D3F-B6C1-E70EC4E4B831}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5AD3CA6D-9091-4D3F-B6C1-E70EC4E4B831}.Release|Any CPU.Build.0 = Release|Any CPU
+		{85FC682D-8592-451D-9A0B-00D3344FB9F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{85FC682D-8592-451D-9A0B-00D3344FB9F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{85FC682D-8592-451D-9A0B-00D3344FB9F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{85FC682D-8592-451D-9A0B-00D3344FB9F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCFDD09F-8928-4E80-A804-82728C9BBE16}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCFDD09F-8928-4E80-A804-82728C9BBE16}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCFDD09F-8928-4E80-A804-82728C9BBE16}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCFDD09F-8928-4E80-A804-82728C9BBE16}.Release|Any CPU.Build.0 = Release|Any CPU
+		{824450DC-66C8-474A-AFF7-FD7ADC1D684C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{824450DC-66C8-474A-AFF7-FD7ADC1D684C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{824450DC-66C8-474A-AFF7-FD7ADC1D684C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{824450DC-66C8-474A-AFF7-FD7ADC1D684C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7141DF4A-2A0E-4CCF-8CA7-EF4F9D3FCF08}
+	EndGlobalSection
+EndGlobal

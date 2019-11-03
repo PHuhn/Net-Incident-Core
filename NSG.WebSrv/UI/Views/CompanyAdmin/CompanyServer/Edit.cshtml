@@ -1,0 +1,193 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyServers.CompanyServerDetailQuery
+@{
+    ViewBag.Title = "Company/Server Edit";
+    // create the server-create-partial w/ pre-initialized values from 1st row
+    NSG.WebSrv.Application.Commands.Servers.ServerCreateCommand createServer =
+            new NSG.WebSrv.Application.Commands.Servers.ServerCreateCommand();
+    createServer.CompanyId = Model.CompanyId;
+    if (Model != null)
+    {
+        if (Model.ServerList != null)
+        {
+            if (Model.ServerList.Count > 0)
+            {
+                NSG.WebSrv.Application.Commands.CompanyServers.ServerDetailQuery server = Model.ServerList[0];
+                createServer.ServerLocation = server.ServerLocation;
+                createServer.FromName = server.FromName;
+                createServer.FromNicName = server.FromNicName;
+                createServer.FromEmailAddress = server.FromEmailAddress;
+                createServer.TimeZone = server.TimeZone;
+                createServer.DST = server.DST;
+                createServer.TimeZone_DST = server.TimeZone_DST;
+                createServer.DST_Start = server.DST_Start;
+                createServer.DST_End = server.DST_End;
+            }
+        }
+    }
+}
+<form asp-controller="CompanyServer" asp-action="CompanyEdit" asp-route-model="@Model" method="post">
+    <h3>Company/Server (Edit - Id: @(Model.CompanyId))</h3>
+    <hr />
+    @Html.AntiForgeryToken()
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-actions no-color">
+        <div class="nsg-float-left text-left">
+            <span>
+                @Html.ActionLink("Back to List", "Index")
+            </span>
+        </div>
+        <div class="nsg-float-right text-right">
+            <span>
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </span>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        @Html.HiddenFor(model => model.CompanyId)
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyShortName">Short Name:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.CompanyShortName, new { htmlAttributes = new { @class = "form-control", @maxlength = "12", @style = "width:160px" } })
+                    @Html.ValidationMessageFor(model => model.CompanyShortName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyName">Name:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control", @maxlength = "80", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Address">Address:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @maxlength = "80", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="City">City:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="State">State:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.State, new { htmlAttributes = new { @class = "form-control", @maxlength = "4", @style = "max-width:120px" } })
+                    @Html.ValidationMessageFor(model => model.State, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PostalCode">PostalCode:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.PostalCode, new { htmlAttributes = new { @class = "form-control", @maxlength = "15", @style = "max-width:200px" } })
+                    @Html.ValidationMessageFor(model => model.PostalCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Country">Country:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.Country, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PhoneNumber">Phone #:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <label class="nsg-md-1-1 nsg-label" for="Notes">Notes:</label>
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", @rows = "3", @style = "max-width:680px" })
+            @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+</form>
+<div id="edit-accordion">
+    <div class="card">
+        <div class="card-header" id="heading-add-server">
+            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-add-server" aria-expanded="false" aria-controls="collapse-add-server">
+                <div class="row nsg-bold">
+                    Add Server
+                </div>
+            </button>
+        </div>
+        <div id="collapse-add-server" class="collapse" aria-labelledby="heading-add-server" data-parent="#edit-accordion">
+            <div class="card-body">
+                @await Html.PartialAsync("ServerCreatePartial", createServer)
+            </div>
+        </div>
+    </div>
+    @if (Model != null)
+    {
+        @if (Model.ServerList != null)
+        {
+            foreach (var srv in Model.ServerList)
+            {
+                <div class="card">
+                    <div class="card-header al" id="@string.Format("heading-server-{0}", srv.ServerId)">
+                        <button class="btn btn-link collapsed" data-toggle="collapse" data-target="@string.Format("#collapse-server-{0}", srv.ServerId)" aria-expanded="false" aria-controls="@string.Format("collapse-server-{0}", srv.ServerId)">
+                            <div class="row nsg-bold">
+                                Server Edit:
+                                @Html.DisplayFor(model => srv.ServerShortName)
+                                (@Html.DisplayFor(model => srv.ServerId))
+                                - @Html.DisplayFor(model => srv.ServerName)
+                            </div>
+                        </button>
+                    </div>
+                    <div id="@string.Format("collapse-server-{0}", srv.ServerId)" class="collapse" aria-labelledby="@string.Format("heading-server-{0}", srv.ServerId)" data-parent="#edit-accordion">
+                        <div class="card-body">
+                            @await Html.PartialAsync("ServerEditPartial", srv)
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    }
+    <div class="card">
+        <div class="card-header" id="heading-template-variable-help">
+            <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-template-variable-help" aria-expanded="false" aria-controls="collapse-template-variable-help">
+                <div class="row nsg-bold">
+                    E-Mail Template Variable List
+                </div>
+            </button>
+        </div>
+        <div id="collapse-template-variable-help" class="collapse" aria-labelledby="heading-template-variable-help" data-parent="#edit-accordion">
+            <div class="card-body">
+                @await Html.PartialAsync("../Shared/EmailTemplateHelpPartial")
+            </div>
+        </div>
+    </div>
+</div>

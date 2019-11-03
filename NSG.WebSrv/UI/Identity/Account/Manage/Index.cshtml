@@ -1,0 +1,79 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Profile";
+    ViewData["ActivePage"] = ManageNavPages.Index;
+}
+<partial name="_StatusMessage" for="StatusMessage" />
+<form id="profile-form" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-actions no-color" style="width: 100%;">
+        <div class="nsg-float-left text-left">
+            <h4>@ViewData["Title"]</h4>
+        </div>
+        <div class="nsg-float-right text-right">
+            <span>
+                <button id="update-profile-button" type="submit" class="btn btn-primary">Save</button>
+            </span>
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <hr />
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="UserName">User Name: </label>
+        <div class="col-md-10">
+            <input asp-for="Username" class="form-control" disabled />
+            <input asp-for="Input.UserName" hidden />
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="Email">Email: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.Email" class="form-control" maxlength="256" />
+            <span asp-validation-for="Input.Email" class="text-danger"></span>
+            @if (!Model.IsEmailConfirmed)
+            {
+                <button id="email-verification" type="submit" asp-page-handler="SendVerificationEmail" class="btn btn-link">Send verification email</button>
+            }
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="PhoneNumber">Phone #: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.PhoneNumber" class="form-control" maxlength="256" />
+            <span asp-validation-for="Input.PhoneNumber" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="FirstName">First Name: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.FirstName" class="form-control" maxlength="100" />
+            <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="LastName">Last Name: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.LastName" class="form-control" maxlength="100" />
+            <span asp-validation-for="Input.LastName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="FullName">Full Name: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.FullName" class="form-control" maxlength="100" />
+            <span asp-validation-for="Input.FullName" class="text-danger"></span>
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="FullName">Nic Name: </label>
+        <div class="col-md-10">
+            <input asp-for="Input.UserNicName" class="form-control" maxlength="16" style="width: 200px;" />
+            <span asp-validation-for="Input.UserNicName" class="text-danger"></span>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

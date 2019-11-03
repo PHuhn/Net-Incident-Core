@@ -1,0 +1,90 @@
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System.IO;
+using System.Threading.Tasks;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
+using Microsoft.EntityFrameworkCore;
+//
+using NSG.WebSrv.UI.Controllers;
+using NSG.WebSrv.Domain.Entities;
+using NSG.WebSrv_Tests.Helpers;
+using NSG.WebSrv.Infrastructure.Notification;
+using Moq;
+//
+namespace NSG.WebSrv_Tests.UI
+{
+    [TestClass]
+    public class AccountController_UnitTests
+    {
+        //
+        public IConfiguration Configuration { get; set;  }
+        MimeKit.NSG.EmailSettings emailSettings = null;
+        ILogger<AccountViewsController> logger = null;
+        AccountViewsController controller = null;
+        ApplicationDbContext context = null;
+        UserManager<ApplicationUser> userManager = null;
+        SignInManager<ApplicationUser> signInManager = null;
+        //
+        public AccountController_UnitTests()
+        {
+            string _appSettings = "appsettings.json";
+            if (_appSettings != "")
+                if (!File.Exists(_appSettings))
+                    throw new FileNotFoundException($"Settings file: {_appSettings} not found.");
+            Configuration = new ConfigurationBuilder()
+                .AddJsonFile(_appSettings, optional: true, reloadOnChange: false)
+                .Build();
+            emailSettings =
+                Configuration.GetSection("EmailSettings").Get<MimeKit.NSG.EmailSettings>();
+            ILoggerFactory _loggerFactory = (ILoggerFactory)new LoggerFactory();
+            logger = new Mock<ILogger<AccountViewsController>>().Object;
+            //
+        }
+        //
+        [TestInitialize()]
+        public void MyTestInitialize()
+        {
+            // public AccountController(
+            //    UserManager<ApplicationUser> userManager,
+            //    SignInManager<ApplicationUser> signInManager,
+            //    ApplicationDbContext context,
+            //    ILogger<AccountRegisterViewModel> logger,
+            //    INotificationService emailSender) : base()
+            userManager = MockHelpers.TestUserManager<ApplicationUser>();
+            signInManager = MockHelpers.TestSignInManager<ApplicationUser>(userManager);
+            INotificationService _emailSender = new FakeNotificationService(emailSettings, logger);
+
+            controller = new AccountViewsController(userManager, signInManager, context, logger, _emailSender);
+        }
+        //
+        [TestMethod]
+        public async Task Logout_Test()
+        {
+            // public virtual async Task SignOutAsync()
+            // {
+            //    await Context.SignOutAsync(IdentityConstants.ApplicationScheme);
+            //    await Context.SignOutAsync(IdentityConstants.ExternalScheme);
+            //    await Context.SignOutAsync(IdentityConstants.TwoFactorUserIdScheme);
+            // }
+            ClaimsPrincipal _user = MockHelpers.TestPrincipal("pub");
+            controller.ControllerContext = new ControllerContext()
+            {
+                HttpContext = new DefaultHttpContext()
+                {
+                    User = _user,
+                    RequestServices = MockHelpers.TestAuthenticationService()
+                }
+            };
+            controller.ControllerContext.HttpContext.Request.Headers["device-id"] = "20317";
+            //
+            await controller.Logout();
+            // controller.ControllerContext.HttpContext.Authentication.
+        }
+        //
+    }
+}

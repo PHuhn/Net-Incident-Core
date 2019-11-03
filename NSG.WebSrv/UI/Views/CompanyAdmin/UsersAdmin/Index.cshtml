@@ -1,0 +1,48 @@
+﻿@model IEnumerable<NSG.WebSrv.Application.Commands.ApplicationUsers.ApplicationUserListQuery>
+@{
+    ViewBag.Title = "Index";
+}
+<h2>User Management</h2>
+<p>
+    User the Register page to create a User
+</p>
+<div class="row nsg-hd-row">
+    <div class="col-md-2"></div>
+    <div class="col-md-2">
+        User Name
+    </div>
+    <div class="col-md-2">
+        Full Name
+    </div>
+    <div class="col-md-2">
+        E-mail
+    </div>
+    <div class="col-md-3">
+        Company
+    </div>
+    <div class="col-md-1"></div>
+</div>
+@foreach (var item in Model)
+{
+    <div class="row nsg-row">
+        <div class="col-md-2">
+            <a asp-action="Details" asp-route-id="@item.UserName">Details</a> |
+            <a asp-action="Edit" asp-route-id="@item.UserName">Edit</a>
+        </div>
+        <div class="col-md-2">
+            @Html.DisplayFor(modelItem => item.UserName)
+        </div>
+        <div class="col-md-2">
+            @Html.DisplayFor(modelItem => item.FullName)
+        </div>
+        <div class="col-md-2">
+            @Html.DisplayFor(modelItem => item.Email)
+        </div>
+        <div class="col-md-3">
+            @(Helpers.DescIdShortDesc(item.CompanyName, item.CompanyId, item.CompanyShortName))
+        </div>
+        <div class="col-md-1">
+            <a asp-action="Delete" asp-route-id="@item.UserName" class="nsg-text-danger">Delete</a>
+        </div>
+    </div>
+}

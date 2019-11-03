@@ -1,0 +1,11 @@
+﻿
+Install-Package FluentValidation
+Install-Package FluentValidation.AspNetCore
+
+Install-Package MediatR
+Install-Package MediatR.Extensions.Microsoft.DependencyInjection
+
+Install-Package OdeToCode.AddFeatureFolders
+
+Install-Package MailKit
+Install-Package NetCore.MailKit

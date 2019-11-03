@@ -1,0 +1,56 @@
+﻿** ScaffoldingReadme **
+
+Support for ASP.NET Core Identity was added to your project
+- The code for adding Identity to your project was generated under Areas/Identity.
+
+Configuration of the Identity related services can be found in the
+ Areas/Identity/IdentityHostingStartup.cs file.
+
+
+The generated UI requires support for static files. To add static files to your app:
+1. Call app.UseStaticFiles() from your Configure method
+
+To use ASP.NET Core Identity you also need to enable authentication.
+To authentication to your app:
+1. Call app.UseAuthentication() from your Configure method (after static files)
+
+The generated UI requires MVC. To add MVC to your app:
+1. Call services.AddMvc() from your ConfigureServices method
+2. Call app.UseMvc() from your Configure method (after authentication)
+
+Apps that use ASP.NET Core Identity should also use HTTPS. To enable HTTPS
+ see https://go.microsoft.com/fwlink/?linkid=848054.
+
+== End of ScaffoldingReadme ==========================================
+** LoginLogoutIssue **
+
+InvalidOperationException: The partial view '_LoginPartial' was not found. The following locations were searched:
+/UI/Areas/Identity/Pages/Account/_LoginPartial.cshtml
+/UI/Areas/Identity/Pages/_LoginPartial.cshtml
+Microsoft.AspNetCore.Mvc.TagHelpers.PartialTagHelper.ProcessAsync(TagHelperContext context, TagHelperOutput output)
+=====================
+An unhandled exception occurred while processing the request.
+InvalidOperationException: The partial view '_CookieConsentPartial' was not found. The following locations were searched:
+/UI/Areas/Identity/Pages/Account/_CookieConsentPartial.cshtml
+/UI/Areas/Identity/Pages/_CookieConsentPartial.cshtml
+Microsoft.AspNetCore.Mvc.TagHelpers.PartialTagHelper.ProcessAsync(TagHelperContext context, TagHelperOutput output)
+=====================
+An unhandled exception occurred while processing the request.
+InvalidOperationException: The layout view '_Layout' could not be located. The following locations were searched:
+/UI/Areas/Identity/Pages/Account/_Layout.cshtml
+/UI/Areas/Identity/Pages/_Layout.cshtml
+Microsoft.AspNetCore.Mvc.Razor.RazorView.GetLayoutPage(ViewContext context, string executingFilePath, string layoutPath)
+=====================
+Manage your account
+Change your account settings
+Profile
+Password
+Two-factor authentication
+Personal data
+Access denied
+You do not have access to this resource.
+=========================
+https://stackoverflow.com/questions/51288801/asp-net-core-2-1-identity-how-to-remove-the-default-ui-razor-pages
+https://techbrij.com/asp-net-core-identity-login-email-username
+https://docs.microsoft.com/en-us/aspnet/core/security/authentication/scaffold-identity?view=aspnetcore-3.0&tabs=visual-studio
+=======================

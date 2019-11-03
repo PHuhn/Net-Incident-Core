@@ -1,0 +1,92 @@
+﻿@model CompanyEmailTemplatesIndexViewModel
+@{
+    ViewBag.Title = "Index";
+    int companyId = 0;
+    if (Model.CompanySelect.Count > 0)
+    {
+        string _companyIdValue = Model.CompanySelect.Where(_cmp => _cmp.Selected == true).FirstOrDefault().Value;
+        if (!string.IsNullOrEmpty(_companyIdValue))
+        {
+            companyId = Convert.ToInt32(_companyIdValue);
+        }
+    }
+    // GetClientScriptList is in  ViewHelpers folder
+    SelectListItem[] clientScriptList = Helpers.GetClientScriptList();
+}
+<h2>Company E-Mail Template (List)</h2>
+<p>
+    <a asp-action="Create" asp-route-companyId="@(companyId)">Create New</a>
+</p>
+<div data-submit-url="@Url.Action("Index", "CompanyEmailTemplates")">
+    <label for='CompanyDropDown'>Company: </label>
+    <select id='CompanyDropDown' asp-for="@(companyId)" asp-items="@Model.CompanySelect" size="1" style="min-height: 25px; width: 300px;"></select>
+    <input type="text" hidden value="@(companyId)" />
+</div>
+<div class="row nsg-hd-row">
+    <div class="col-md-2"></div>
+    <div class="col-md-1 nsg-hd-col">
+        Short Desc
+    </div>
+    <div class="col-md-3 nsg-hd-col">
+        Type Desc
+    </div>
+    <div class="col-md-1 nsg-hd-col">
+        Use Server Values
+    </div>
+    <div class="col-md-4 nsg-hd-col">
+        Subject Line
+    </div>
+    <div class="col-md-1"></div>
+</div>
+@foreach (var item in Model.CompanyEmailTemplates)
+{
+    <div class="row nsg-row">
+        <div class="col-md-2">
+            <a asp-action="Details" asp-route-companyId="@item.CompanyId" asp-route-incidentTypeId="@item.IncidentTypeId">Details</a> |
+            <a asp-action="Edit" asp-route-companyId="@item.CompanyId" asp-route-incidentTypeId="@item.IncidentTypeId">Edit</a>
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayFor(modelItem => item.IncidentTypeShortDesc)
+        </div>
+        <div class="col-md-3">
+            @Html.DisplayFor(modelItem => item.IncidentTypeDesc)
+        </div>
+        <div class="col-md-1">
+            @Html.DisplayFor(modelItem => item.FromServer)
+        </div>
+        <div class="col-md-4">
+            @( item.SubjectLine.TruncateString(35) )
+        </div>
+        <div class="col-md-1">
+            <a asp-action="Delete" asp-route-companyId="@item.CompanyId" asp-route-incidentTypeId="@item.IncidentTypeId" class="nsg-text-danger">Delete</a>
+        </div>
+    </div>
+}
+<script type="text/javascript">
+    //
+    var controller = "CompanyEmailTemplates";
+    //
+    $(document).ready(function () {
+        console.log("javascript ready ...");
+        //
+        var id = 1;
+        var json = @Html.Raw(Json.Serialize(Model.IncidentTypes));
+        console.log(json);
+        var it = json.find(function (el) { return el.incidentTypeId === id; });
+        if (it !== null && it !== undefined) {
+            console.log(it);
+            console.log("found it");
+        }
+        //
+        $("#CompanyDropDown").on("change", function () {
+            var this_ = $(this);
+            var id = this_.val();
+            console.log(`#CompanyDropDown changed... ${id}`);
+            var url = this_.parent().data("submit-url") + `?companyId=${id}`;
+            window.location.href = url;
+        });
+        // $ ("#createLink").attr("href", "/" + controller "/create/" + GetParentID());
+        //
+    });
+    //
+</script>

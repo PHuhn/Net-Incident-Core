@@ -1,0 +1,90 @@
+﻿            [Required]
+            [MaxLength(256)]
+            [Display(Name = "User Name/Email")]
+            public string UserName { get; set; }
+
+        public class InputModel
+        {
+            //
+            [Required]
+            [MaxLength(256)]
+            [Display(Name = "User Name")]
+            public string UserName { get; set; }
+            //
+            [Required]
+            [EmailAddress]
+            [Display(Name = "Email")]
+            public string Email { get; set; }
+            //
+            [Required]
+            [MaxLength(100)]
+            [Display(Name = "First Name")]
+            public string FirstName { get; set; }
+            //
+            [Required]
+            [MaxLength(100)]
+            [Display(Name = "Last Name")]
+            public string LastName { get; set; }
+            //
+            [Required]
+            [MaxLength(16)]
+            [Display(Name = "Nic Name")]
+            public string UserNicName { get; set; }
+            //
+            [Required]
+            [StringLength(12)]
+            [Display(Name = "Server Short Name")]
+            public string ServerShortName { get; set; }
+            //
+            [Required]
+            [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
+            [DataType(DataType.Password)]
+            [Display(Name = "Password")]
+            public string Password { get; set; }
+            //
+            [DataType(DataType.Password)]
+            [Display(Name = "Confirm password")]
+            [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
+            public string ConfirmPassword { get; set; }
+            //
+        }
+            <div class="form-group">
+                <label asp-for="Input.UserName">User Name</label>
+                <input asp-for="Input.UserName" class="form-control" />
+                <span asp-validation-for="Input.UserName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Email"></label>
+                <input asp-for="Input.Email" class="form-control" />
+                <span asp-validation-for="Input.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.FirstName">First Name</label>
+                <input asp-for="Input.FirstName" class="form-control" />
+                <span asp-validation-for="Input.FirstName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.LastName">Last Name</label>
+                <input asp-for="Input.LastName" class="form-control" />
+                <span asp-validation-for="Input.LastName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.UserNicName">Nic Name</label>
+                <input asp-for="Input.UserNicName" class="form-control" />
+                <span asp-validation-for="Input.UserNicName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ServerShortName">Server Short-name</label>
+                <input asp-for="Input.ServerShortName" class="form-control" />
+                <span asp-validation-for="Input.ServerShortName" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.Password"></label>
+                <input asp-for="Input.Password" class="form-control" />
+                <span asp-validation-for="Input.Password" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Input.ConfirmPassword"></label>
+                <input asp-for="Input.ConfirmPassword" class="form-control" />
+                <span asp-validation-for="Input.ConfirmPassword" class="text-danger"></span>
+            </div>

@@ -1,0 +1,29 @@
+﻿@{
+    ViewBag.Link = "https://github.com/PHuhn?tab=repositories";
+}
+<div class="jumbotron">
+    <h2>Contact Us</h2>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='applicationName'>Application Name: </label></div>
+        <div id='applicationName' class='col-md-10'>Web Service for Network Incident</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='companyName'>Company Name: </label></div>
+        <div id='companyName' class='col-md-10'>Northern Software Group</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='contactName'>Contact: </label></div>
+        <div id='contactName' class='col-md-10'>Phil Huhn</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='contactEmail'>E-mail: </label></div>
+        <div id='contactEmail' class='col-md-10'>PhilHuhn@yahoo.com</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='githubLink'>Link: </label></div>
+        <div id='githubLink' class='col-md-10'>
+            <a target='_blank' href='@ViewBag.Link'>@ViewBag.Link</a>
+        </div>
+    </div>
+</div>
+<!--  -->

@@ -1,0 +1,202 @@
+﻿/*
+    Please see documentation 
+    at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+    for details on configuring this project to bundle and minify static web assets.
+*/
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+    font-family: "Helvetica Neue",Helvetica,Arial,sans-serif;
+    font-size: 14px;
+    line-height: 1.43;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  /* Set the fixed height of the footer here */
+  height: 60px;
+  line-height: 60px; /* Vertically center the text there */
+}
+/*
+* NSG specific styles
+*/
+dt, label {
+    color: navy;
+    font-weight: bold;
+}
+/* .validation-summary-errors */
+.nsg-msg-alerts {
+    width: 300px;
+    min-height: 35px;
+    margin: 2px 0 0 0;
+    padding: 8px 1px 1px 1px;
+    position: fixed;
+    top: 55px;
+    right: 10px;
+    z-index: 20000;
+    background-position: -312px 0;
+    border: 1px solid red;
+    font-weight: bold;
+    background-color: #ffffff;
+}
+/* background: #ffffff top left no-repeat 14px 14px; */
+/* unordered list of alerts */
+nsg-alerts-msg-ul {
+    background-color: white;
+    list-style: square;
+}
+/* Info */
+.nsg-msg-info {
+    color: dodgerblue;
+    background-color: white;
+}
+/* Success */
+.nsg-msg-success {
+    color: forestgreen;
+    background-color: white;
+}
+/* Warning */
+.nsg-msg-warn {
+    color: darkorange;
+    background-color: white;
+}
+/* Error/Danger */
+.nsg-msg-error, .nsg-msg-danger {
+    color: red;
+    background-color: white;
+}
+
+.nsg-td-label {
+    padding: 0 2px 0 5px;
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+.nsg-bold {
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+/* Error/Danger */
+.nsg-text-error, .nsg-text-danger {
+    color: red;
+    font-weight: bold;
+}
+
+.nsg-container {
+    width: 100%;
+    display: inline-block;
+}
+
+.nsg-md-1-1 {
+    position: relative;
+    min-height: 1px;
+    padding-left: 15px;
+    padding-right: 15px;
+}
+
+.nsg-float-left {
+    float: left;
+}
+
+.nsg-float-right {
+    float: right;
+}
+
+.nsg-clear-left {
+    clear: left;
+}
+
+.nsg-clear-both {
+    clear: both;
+}
+
+.nsg-hd-row {
+    border-style: solid;
+    border-width: 1px 0 1px 0;
+    border-color: gray;
+    margin: 0 0 0 0;
+    padding: 6px 0 6px 0;
+    font-weight: bold;
+    width: 100%;
+}
+
+.nsg-hd-col {
+    display: inline-block;
+    align-self: flex-end;
+}
+
+.nsg-row {
+    border-style: solid;
+    border-width: 0 0 1px 0;
+    border-color: lightgray;
+    line-height: 2;
+    margin: 0 0 0 0;
+    width: 100%;
+}
+
+@media (min-width: 992px) {
+    /*@media all and (min-width:992px)*/
+    .nsg-md-1-1 {
+        width: 12.48%;
+        float: left;
+    }
+}
+.nsg-label {
+    text-align: right;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-weight: bold;
+}
+
+@media (max-width: 768px) {
+    .nsg-label {
+        text-align: left !important;
+    }
+}

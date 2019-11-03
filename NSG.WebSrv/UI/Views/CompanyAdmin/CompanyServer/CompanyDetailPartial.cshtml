@@ -1,0 +1,82 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyServers.CompanyServerDetailQuery
+<div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyShortName">Short Name:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.CompanyShortName)
+                    (@Html.DisplayFor(model => model.CompanyId))
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyName">Name:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.CompanyName)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Address">Address:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Address)
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="City">City:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.City)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="State">State:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.State)
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PostalCode">PostalCode:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.PostalCode)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Country">Country:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.Country)
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PhoneNumber">Phone #:</label>
+                <div class="col-md-9">
+                    @Html.DisplayFor(model => model.PhoneNumber)
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <label class="nsg-md-1-1 nsg-label" for="Notes">Notes:</label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Notes)
+        </div>
+    </div>
+</div>

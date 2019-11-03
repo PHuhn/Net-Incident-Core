@@ -1,0 +1,44 @@
+﻿
+Install-Package Microsoft.Extensions.Configuration.Json
+
+Install-Package Moq
+Install-Package Microsoft.Extensions.Logging.Console
+
+Install-Package Microsoft.EntityFrameworkCore
+Install-Package Microsoft.AspNetCore.Identity.EntityFrameworkCore
+Install-Package Microsoft.EntityFrameworkCore.InMemory
+
+Application User
+	https://stackoverflow.com/questions/51004516/net-core-2-1-identity-get-all-users-with-their-associated-roles
+
+PM> Add-Migration "Update-2019-09-06-13-00"
+PM> Update-Database
+
+
+    public partial class Update201910161500 : Migration
+    {
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddColumn<string>(
+                name: "Discriminator",
+                maxLength: 254,
+                table: "AspNetUserRoles",
+                nullable: false,
+                defaultValue: "");
+        }
+
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropColumn(
+                name: "Discriminator",
+                table: "AspNetUserRoles");
+        }
+    }
+
+** roll-back update **
+
+PM> Update-Database -Migration "Update-2019-10-16-15-00"
+
+PM> Remove-Migration -Force
+
+PM> Add-Migration "Update-2019-10-06-23-09-00"

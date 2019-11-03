@@ -1,0 +1,161 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyEmailTemplates.CompanyEmailTemplateCreateCommand
+@{
+    ViewBag.Title = "Create";
+    var companySelectionList = ViewBag.Support.CompanySelect;
+    var incidentTypeSelectionList = ViewBag.Support.IncidentTypeSelect;
+    var incidentTypes = ViewBag.Support.IncidentTypes;
+}
+<div class="container">
+    <h2>Company E-Mail Template (Create)</h2>
+    <form asp-controller="CompanyEmailTemplates" asp-action="Create" asp-route-model="@Model">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    <a asp-action="Index" asp-route-companyId="@Model.CompanyId">Back to List</a>
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <span>
+                    <input type="submit" value="Create" class="btn btn-primary" />
+                </span>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div id="edit-accordion">
+            <div class="card">
+                <div class="card-header" id="heading-template-variable-help">
+                    <div class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-template-variable-help" aria-expanded="false" aria-controls="collapse-template-variable-help">
+                        <div class="row nsg-bold">
+                            E-Mail Template Variable List
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse-template-variable-help" class="collapse" aria-labelledby="heading-template-variable-help" data-parent="#edit-accordion">
+                    <div class="card-body">
+                        @await Html.PartialAsync("../Shared/EmailTemplateHelpPartial")
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="form-horizontal">
+
+            <input type="hidden" asp-for="CompanyId" />
+            <div class="row">
+                <label for='CompanyId' class='nsg-label col-md-2'>Company:</label>
+                <div class="col-md-10">
+                    <select asp-for="CompanyId" class="form-control" asp-items="@companySelectionList" style="max-width: 300px;" disabled></select>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='IncidentTypeId' class='nsg-label col-md-2'>Incident Type:</label>
+                <div class="col-md-10">
+                    <select asp-for="IncidentTypeId" class="form-control" asp-items="@incidentTypeSelectionList" style="max-width: 300px;">
+                        <option value="">- select a value -</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='FromServer' class='nsg-label col-md-2'>Use Server Values:</label>
+                <div class="col-md-10">
+                    <div class="checkbox">
+                        <input class="form-check-input" asp-for="FromServer" />
+                        <strong>&lt;= From e-mail name and address</strong>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='SubjectLine' class='nsg-label col-md-2'>Subject Line:</label>
+                <div class="col-md-10">
+                    <input asp-for="SubjectLine" class="form-control" style="width: 100%;" />
+                    <span asp-validation-for="SubjectLine" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='EmailBody' class='nsg-label col-md-2'>Email Template:</label>
+                <div class="col-md-10">
+                    <textarea asp-for="EmailBody" class="form-control; text-wrap:normal" type="text" rows="3" style="width: 100%"></textarea>
+                    <span asp-validation-for="EmailBody" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='TimeTemplate' class='nsg-label col-md-2'>Time Template:</label>
+                <div class="col-md-10">
+                    <input asp-for="TimeTemplate" class="form-control" style="width: 100%;" />
+                    <span asp-validation-for="TimeTemplate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='ThanksTemplate' class='nsg-label col-md-2'>ThanksTemplate</label>
+                <div class="col-md-10">
+                    <input asp-for="ThanksTemplate" class="form-control" style="width: 100%;" />
+                    <span asp-validation-for="ThanksTemplate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='LogTemplate' class='nsg-label col-md-2'>Log Template:</label>
+                <div class="col-md-10">
+                    <input asp-for="LogTemplate" class="form-control" style="width: 100%;" />
+                    <span asp-validation-for="LogTemplate" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="row">
+                <label for='Template' class='nsg-label col-md-2'>Template:</label>
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Template, new { htmlAttributes = new { @class = "form-control", @style = "width: 100%" } })
+                    <span asp-validation-for="Template" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+<script type="text/javascript">
+    //
+    var codeName = 'CompanyEmailTemplate.Create';
+    //
+    $(document).ready(function () {
+        $("#IncidentTypeId").change(function () {
+            console.log(codeName + ': in IncidentTypeId change.');
+            console.log(@Model.CompanyId);
+            console.log(@Model.IncidentTypeId);
+            var this_ = $(this);
+            var id = parseInt( this_.val( ) );
+            console.log(id);
+            var json = @Html.Raw(Json.Serialize(incidentTypes));
+            console.log(json);
+            var it = json.find(function (el) { return el.incidentTypeId === id; });
+            if (it !== null && it !== undefined) {
+                console.log(it);
+                console.log($('#SubjectLine').val());
+                console.log(it.incidentTypeSubjectLine);
+                console.log("found it");
+                // assign the values from the default to the company specific e-mail template
+                $('#FromServer').attr('checked', it.incidentTypeFromServer);
+                $('#SubjectLine').val(it.incidentTypeSubjectLine);
+                $('#EmailBody').val(it.incidentTypeEmailTemplate);
+                $('#TimeTemplate').val(it.incidentTypeTimeTemplate);
+                $('#ThanksTemplate').val(it.incidentTypeThanksTemplate);
+                $('#LogTemplate').val(it.incidentTypeLogTemplate);
+                $('#Template').val(it.incidentTypeTemplate);
+            } else {
+                console.error(codeName + ': ERROR, IncidentType not found.');
+            }
+        });
+        //
+        $('#backLink').click(function () {
+            var this_ = $(this);
+            var id = $('#CompanyId').val();
+            this_[0].search = `?companyId=${id}`;
+            console.log(codeName + ' backLink clicked, ' + this_[0].search);
+        });
+    });
+    //
+</script>

@@ -1,0 +1,32 @@
+﻿@model NSG.WebSrv.Application.Commands.ApplicationRoles.ApplicationRoleUserDetailQuery
+
+<div class="container">
+    <hr />
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="NoteTypeId">Id:</label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Id)
+        </div>
+    </div>
+    <div class="row">
+        <label class="col-md-2 nsg-label" for="Name">Name:</label>
+        <div class="col-md-10">
+            @Html.DisplayFor(model => model.Name)
+        </div>
+    </div>
+    <h4>List of users in this role</h4>
+    @if (Model.UserList.Count == 0)
+    {
+        <hr />
+        <p>No users found in this role.</p>
+    }
+    <div class="row">
+        @foreach (var item in Model.UserList)
+        {
+            <div class="col-md-3">
+                @item.UserName
+            </div>
+        }
+    </div>
+    <div style="clear: left;"></div>
+</div>

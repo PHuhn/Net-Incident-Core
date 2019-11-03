@@ -1,0 +1,44 @@
+﻿@{
+    ViewData["Title"] = "About";
+    ViewBag.applicationName = "NSG Application";
+    if (Model == null || string.IsNullOrEmpty(Model.Copyright))
+    {
+        ViewBag.product = "-Unknown-";
+        ViewBag.companyName = "Northern Software Group";
+        ViewBag.copyright = "Copyright © 2019";
+        ViewBag.version = "Alpha";
+        ViewBag.description = "- Description -";
+    }
+    else
+    {
+        ViewBag.product = Model.Product;
+        ViewBag.companyName = Model.Company;
+        ViewBag.copyright = Model.Copyright;
+        ViewBag.version = Model.Version;
+        ViewBag.description = Model.Description;
+    }
+}
+<div class="jumbotron">
+    <h2>@ViewBag.Title</h2>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='applicationName'>Application: </label></div>
+        <div id='applicationName' class='col-md-10'>@ViewBag.product</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='companyName'>Company: </label></div>
+        <div id='companyName' class='col-md-10'>@ViewBag.companyName</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='copyright'>Copyright: </label></div>
+        <div id='copyright' class='col-md-10'>@ViewBag.copyright</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='version'>Version: </label></div>
+        <div id='version' class='col-md-10'>@ViewBag.version</div>
+    </div>
+    <div class="row">
+        <div class='col-md-2 nsg-label'><label for='description'></label></div>
+        <div id='description' class='col-md-10'>@ViewBag.description</div>
+    </div>
+</div>
+<!--  -->

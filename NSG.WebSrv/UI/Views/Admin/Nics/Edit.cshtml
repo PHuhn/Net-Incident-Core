@@ -1,0 +1,60 @@
+﻿@model NSG.WebSrv.Application.Commands.NICs.NICDetailQuery
+@{
+    ViewData["Title"] = "Edit";
+}
+<h2>NIC (Edit)</h2>
+<hr />
+<div class="container">
+    <form asp-controller="Nics" asp-action="Edit" asp-route-model="@Model">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    @Html.ActionLink("Back to List", "Index")
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <input type="hidden" asp-for="NIC_Id" />
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NIC_Id">NIC Id:</label>
+            <div class="col-sm-10">
+                @Html.DisplayFor(model => model.NIC_Id)
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NICDescription">Description:</label>
+            <div class="col-sm-10">
+                <input asp-for="NICDescription" class="form-control" maxlength="255" size="60" style="width: 550px;" />
+                <span asp-validation-for="NICDescription" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NICAbuseEmailAddress">Abuse Email:</label>
+            <div class="col-sm-10">
+                <input asp-for="NICAbuseEmailAddress" class="form-control" maxlength="50" size="50" style="width: 460px;" />
+                <span asp-validation-for="NICAbuseEmailAddress" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NICRestService">Rest Service:</label>
+            <div class="col-sm-10">
+                <input asp-for="NICRestService" class="form-control" maxlength="255" size="60" style="width: 550px;" />
+                <span asp-validation-for="NICRestService" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="NICWebSite">Web-Site:</label>
+            <div class="col-sm-10">
+                <input asp-for="NICWebSite" class="form-control" maxlength="255" size="60" style="width: 550px;" />
+                <span asp-validation-for="NICWebSite" class="text-danger"></span>
+            </div>
+        </div>
+    </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

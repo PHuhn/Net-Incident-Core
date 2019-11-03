@@ -1,0 +1,109 @@
+﻿@model NSG.WebSrv.Application.Commands.Companies.CompanyCreateCommand
+@{
+    ViewBag.Title = "Create";
+}
+<h2>Company/Server (Create)</h2>
+<hr />
+<form asp-controller="CompanyServer" asp-action="CompanyCreate" asp-route-model="@Model" method="post">
+    <div asp-validation-summary="All" class="text-danger"></div>
+    @Html.AntiForgeryToken()
+    <div class="form-actions no-color">
+        <div class="nsg-float-left text-left">
+            <span>
+                @Html.ActionLink("Back to List", "Index")
+            </span>
+        </div>
+        <div class="nsg-float-right text-right">
+            <input type="submit" value="Save" class="btn btn-primary" />
+        </div>
+        <div style="clear: both;"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyShortName">Short Name:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.CompanyShortName, new { htmlAttributes = new { @class = "form-control", @maxlength = "12", @style = "width:160px" } })
+                    @Html.ValidationMessageFor(model => model.CompanyShortName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="CompanyName">Name:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.CompanyName, new { htmlAttributes = new { @class = "form-control", @maxlength = "80", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.CompanyName, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Address">Address:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.Address, new { htmlAttributes = new { @class = "form-control", @maxlength = "80", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.Address, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="City">City:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.City, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.City, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="State">State:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.State, new { htmlAttributes = new { @class = "form-control", @maxlength = "4", @style = "max-width:120px" } })
+                    @Html.ValidationMessageFor(model => model.State, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PostalCode">PostalCode:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.PostalCode, new { htmlAttributes = new { @class = "form-control", @maxlength = "15", @style = "max-width:200px" } })
+                    @Html.ValidationMessageFor(model => model.PostalCode, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="Country">Country:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.Country, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.Country, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="row">
+                <label class="col-md-3 nsg-label" for="PhoneNumber">Phone #:</label>
+                <div class="col-md-9">
+                    @Html.EditorFor(model => model.PhoneNumber, new { htmlAttributes = new { @class = "form-control", @maxlength = "50", @style = "max-width:390px" } })
+                    @Html.ValidationMessageFor(model => model.PhoneNumber, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <label class="nsg-md-1-1 nsg-label" for="Notes">Notes:</label>
+        <div class="col-md-10">
+            @Html.TextAreaFor(model => model.Notes, new { @class = "form-control", @rows = "3", @style = "max-width:680px" })
+            @Html.ValidationMessageFor(model => model.Notes, "", new { @class = "text-danger" })
+        </div>
+    </div>
+    <div class="nsg-clear-left"></div>
+</form>

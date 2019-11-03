@@ -1,0 +1,63 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyEmailTemplates.CompanyEmailTemplateDetailQuery
+<div class="row">
+    <label class="col-md-2 nsg-label" for="CompanyShortName">Company:</label>
+    <div class="col-md-9">
+        @(Helpers.DescIdShortDesc(Model.CompanyName, Model.CompanyId, Model.CompanyShortName))
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="IncidentTypeShortDesc">Incident Type:</label>
+    <div class="col-md-9">
+        @(Helpers.DescIdShortDesc(Model.IncidentTypeDesc, Model.IncidentTypeId, Model.IncidentTypeShortDesc))
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="FromServer">Use Server Values:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.FromServer)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="SubjectLine">Subject Line:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.SubjectLine)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="EmailBody">Body Template:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.EmailBody)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="TimeTemplate">Time Template:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.TimeTemplate)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="ThanksTemplate">Thanks Template:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.ThanksTemplate)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="LogTemplate">Log Template:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.LogTemplate)
+    </div>
+</div>
+
+<div class="row">
+    <label class="col-md-2 nsg-label" for="Template">Template:</label>
+    <div class="col-md-9">
+        @Html.DisplayFor(model => model.Template)
+    </div>
+</div>

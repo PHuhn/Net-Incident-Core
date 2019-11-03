@@ -1,0 +1,44 @@
+﻿@model NSG.WebSrv.Application.Commands.ApplicationRoles.ApplicationRoleUpdateCommand
+@{
+    ViewBag.Title = "Edit";
+}
+<h2>Roles (Edit)</h2>
+<div class="container">
+    <form asp-controller="RolesAdmin" asp-action="Edit" asp-route-model="@Model">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @Html.AntiForgeryToken()
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    <a asp-action="Index">Back to List</a>
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <span>
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </span>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+
+        <div class="form-horizontal">
+            <hr />
+
+            <input type="hidden" asp-for="Id" />
+            <div class="row">
+                <label class="col-md-2 nsg-label" for="Id">Id:</label>
+                <div class="col-md-10">
+                    @Html.DisplayFor(model => model.Id)
+                </div>
+            </div>
+
+            <div class="row">
+                <label class="col-md-2 nsg-label" for="Name">Name:</label>
+                <div class="col-md-10">
+                    <input asp-for="Name" class="form-control" maxlength="255" size="60" style="width: 100%;" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

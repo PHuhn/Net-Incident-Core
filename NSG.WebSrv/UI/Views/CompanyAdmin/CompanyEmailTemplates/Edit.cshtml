@@ -1,0 +1,119 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyEmailTemplates.CompanyEmailTemplateUpdateCommand
+@{
+    ViewData["Title"] = "Edit";
+    NSG.WebSrv.Application.Commands.CompanyEmailTemplates.CompanyEmailTemplateDetailQuery detailQuery = ViewBag.DetailQuery;
+}
+<h2>Company E-Mail Template (Edit)</h2>
+<hr />
+<div class="container">
+    <form asp-controller="CompanyEmailTemplates" asp-action="Edit" asp-route-model="@Model" method="post">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="CompanyId" />
+        <input type="hidden" asp-for="IncidentTypeId" />
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    <a asp-action="Index" asp-route-companyId="@Model.CompanyId">Back to List</a>
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <span>
+                    <input type="submit" value="Save" class="btn btn-primary" />
+                </span>
+            </div>
+            <div style="clear: both;"></div>
+        </div>
+        <div id="edit-accordion">
+            <div class="card">
+                <div class="card-header" id="heading-template-variable-help">
+                    <div class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapse-template-variable-help" aria-expanded="false" aria-controls="collapse-template-variable-help">
+                        <div class="row nsg-bold">
+                            E-Mail Template Variable List
+                        </div>
+                    </div>
+                </div>
+                <div id="collapse-template-variable-help" class="collapse" aria-labelledby="heading-template-variable-help" data-parent="#edit-accordion">
+                    <div class="card-body">
+                        @await Html.PartialAsync("../Shared/EmailTemplateHelpPartial")
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label for='CompanyId' class='nsg-label col-md-2'>Company:</label>
+            <div class="col-md-10">
+                @(Helpers.DescIdShortDesc(detailQuery.CompanyName, detailQuery.CompanyId, detailQuery.CompanyShortName))
+            </div>
+        </div>
+
+        <div class="row">
+            <label for='IncidentTypeId' class='nsg-label col-md-2'>Incident Type:</label>
+            <div class="col-md-10">
+                @(Helpers.DescIdShortDesc(detailQuery.IncidentTypeDesc, detailQuery.IncidentTypeId, detailQuery.IncidentTypeShortDesc))
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="FromServer">Use Server Values:</label>
+            <div class="col-md-10">
+                <div class="checkbox">
+                    <input class="form-check-input" asp-for="FromServer" />
+                    <strong>&lt;= From e-mail name and address</strong>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="SubjectLine">Subject Line:</label>
+            <div class="col-md-10">
+                <input asp-for="SubjectLine" class="form-control" />
+                <span asp-validation-for="SubjectLine" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="EmailBody">Body Template:</label>
+            <div class="col-md-10">
+                <input asp-for="EmailBody" class="form-control" />
+                <span asp-validation-for="EmailBody" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="TimeTemplate">Time Template:</label>
+            <div class="col-md-10">
+                <input asp-for="TimeTemplate" class="form-control" />
+                <span asp-validation-for="TimeTemplate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="ThanksTemplate">Thanks Template:</label>
+            <div class="col-md-10">
+                <input asp-for="ThanksTemplate" class="form-control" />
+                <span asp-validation-for="ThanksTemplate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="LogTemplate">Log Template:</label>
+            <div class="col-md-10">
+                <input asp-for="LogTemplate" class="form-control" />
+                <span asp-validation-for="LogTemplate" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="row">
+            <label class="col-md-2 nsg-label" for="Template">Template:</label>
+            <div class="col-md-10">
+                <input asp-for="Template" class="form-control" />
+                <span asp-validation-for="Template" class="text-danger"></span>
+            </div>
+        </div>
+
+        </form>
+</div>
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

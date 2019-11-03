@@ -1,0 +1,23 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyEmailTemplates.CompanyEmailTemplateDetailQuery
+@{
+    ViewBag.Title = "Details";
+}
+<h2>Company E-Mail Template (Details)</h2>
+<div class="container">
+    <div class="form-actions no-color">
+        <div class="nsg-float-left text-left">
+            <span>
+                <a asp-action="Index" asp-route-companyId="@Model.CompanyId">Back to List</a>
+            </span>
+        </div>
+        <div class="nsg-float-right text-right">
+            <span>
+                <a asp-action="Edit" asp-route-companyId="@Model.CompanyId" asp-route-incidentTypeId="@Model.IncidentTypeId">Edit</a>
+            </span>
+        </div>
+        <div class="nsg-clear-both"></div>
+    </div>
+
+    @await Html.PartialAsync("CompanyEmailTemplateDetailsPartial", @Model)
+
+</div>

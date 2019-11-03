@@ -1,0 +1,5 @@
+﻿
+Install-Package Microsoft.AspNetCore.TestHost
+Install-Package Microsoft.AspNetCore.App
+Install-Package Microsoft.EntityFrameworkCore.InMemory
+Install-Package Microsoft.AspNetCore.App

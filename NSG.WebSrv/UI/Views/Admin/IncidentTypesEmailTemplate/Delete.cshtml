@@ -1,0 +1,29 @@
+﻿@model NSG.WebSrv.Application.Commands.IncidentTypes.IncidentTypeDetailQuery
+@{
+    ViewData["Title"] = "Delete";
+}
+<div class="container">
+    <h2>Incident Type/E-Mail Templete (Delete)</h2>
+    <hr />
+    @Html.AntiForgeryToken()
+    <form asp-action="Delete">
+        <input type="hidden" asp-for="IncidentTypeId" />
+        <div class="form-actions no-color">
+            <div class="nsg-float-left text-left">
+                <span>
+                    @Html.ActionLink("Back to List", "Index")
+                </span>
+            </div>
+            <div class="nsg-float-right text-right">
+                <span>
+                    <strong>Are you sure you want to delete this Incident Type/E-Mail Templete?</strong>
+                    <input type="submit" value="Delete" class="btn btn-danger" />
+                </span>
+            </div>
+            <div class="nsg-clear-both"></div>
+        </div>
+    </form>
+
+    @await Html.PartialAsync("IncidentTypeDetailPartial", @Model)
+
+</div>

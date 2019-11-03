@@ -1,0 +1,49 @@
+﻿@model NSG.WebSrv.Application.Commands.CompanyServers.CompanyServerDetailQuery
+@{
+    ViewBag.Title = "Details";
+}
+<h2>Company/Server (Details)</h2>
+<hr />
+<div class="container">
+    <div class="form-actions no-color">
+        <div class="nsg-float-left text-left">
+            <span>
+                <a asp-action="Index">Back to List</a>
+            </span>
+        </div>
+        <div class="nsg-float-right text-right">
+            <span>
+                <a asp-action="Edit" asp-route-id="@Model.CompanyId">Edit</a>
+            </span>
+        </div>
+        <div class="nsg-clear-both"></div>
+    </div>
+
+    @await Html.PartialAsync("CompanyDetailPartial", @Model)
+
+    <div id="detail-accordion">
+        @if (Model != null)
+        {
+            foreach (var srv in Model.ServerList)
+            {
+                <div class="card">
+                    <div class="card-header" id="@string.Format("heading-{0}", srv.ServerId)">
+                        <button class="btn btn-link collapsed row" data-toggle="collapse" data-target="@string.Format("#collapse-{0}", srv.ServerId)" aria-expanded="false" aria-controls="@string.Format("collapse-{0}", srv.ServerId)">
+                            <div class="mb-0 nsg-bold">
+                                Server Detail:
+                                @Html.DisplayFor(model => srv.ServerShortName)
+                                (@Html.DisplayFor(model => srv.ServerId))
+                                - @Html.DisplayFor(model => srv.ServerName)
+                            </div>
+                        </button>
+                    </div>
+                    <div id="@string.Format("collapse-{0}", srv.ServerId)" class="collapse" aria-labelledby="@string.Format("heading-{0}", srv.ServerId)" data-parent="#detail-accordion">
+                        <div class="card-body">
+                            @await Html.PartialAsync("ServerDetailPartial", srv)
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>
