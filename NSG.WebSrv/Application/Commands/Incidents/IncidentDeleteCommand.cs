@@ -58,7 +58,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         /// <returns>Returns the row count.</returns>
         public async Task<int> Handle(IncidentDeleteCommand request, CancellationToken cancellationToken)
 		{
-            if (_application.IsCompanyAdmin() == false)
+            if (_application.IsCompanyAdminRole() == false)
             {
                 throw new IncidentDeleteCommandPermissionsException("user not company/admin group.");
             }

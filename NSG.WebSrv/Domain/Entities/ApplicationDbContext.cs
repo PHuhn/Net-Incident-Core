@@ -120,6 +120,9 @@ namespace NSG.WebSrv.Domain.Entities
                     .HasForeignKey(nl => nl.IncidentTypeId).OnDelete(DeleteBehavior.Restrict);
                 item.HasOne(nl => nl.Server).WithMany(s => s.NetworkLogs)
                     .HasForeignKey(nl => nl.ServerId).OnDelete(DeleteBehavior.Restrict);
+                // Incident is an optional nullable relationship
+                item.HasOne(nl => nl.Incident).WithMany(i => i.NetworkLogs)
+                    .HasForeignKey(nl => nl.IncidentId).IsRequired(false);
             });
             //
             modelBuilder.Entity<NIC>((item) =>

@@ -34,6 +34,9 @@ namespace NSG.WebSrv.Domain.Entities
         //
         public virtual IncidentType IncidentType { get; set; }
         public virtual Server Server { get; set; }
+        // Incident is an optional nullable relationship
+        public virtual Incident Incident { get; set; }
+        //
     }
 }
 // ---------------------------------------------------------------------------

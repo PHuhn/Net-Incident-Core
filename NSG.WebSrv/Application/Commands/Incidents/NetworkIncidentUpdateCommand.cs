@@ -33,13 +33,23 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		public bool Closed { get; set; }
 		public bool Special { get; set; }
 		public string Notes { get; set; }
-		public DateTime CreatedDate { get; set; }
-	}
-	//
-	/// <summary>
-	/// 'Incident' update command handler.
-	/// </summary>
-	public class NetworkIncidentUpdateCommandHandler : IRequestHandler<NetworkIncidentUpdateCommand, int>
+        //
+        public string message;
+        //
+        public List<IncidentNoteData> incidentNotes;
+        public List<IncidentNoteData> deletedNotes;
+        //
+        public List<NetworkLogData> networkLogs;
+        public List<NetworkLogData> deletedLogs;
+        //
+        public UserServerData user;
+        //
+    }
+    //
+    /// <summary>
+    /// 'Incident' update command handler.
+    /// </summary>
+    public class NetworkIncidentUpdateCommandHandler : IRequestHandler<NetworkIncidentUpdateCommand, int>
 	{
 		private readonly IDb_Context _context;
         private IApplication _application;
@@ -85,7 +95,6 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 			_entity.Closed = request.Closed;
 			_entity.Special = request.Special;
 			_entity.Notes = request.Notes;
-			_entity.CreatedDate = request.CreatedDate;
 			//
 			await _context.SaveChangesAsync(cancellationToken);
 			// Return the row count.
@@ -115,7 +124,6 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				RuleFor(x => x.Closed).NotNull();
 				RuleFor(x => x.Special).NotNull();
 				RuleFor(x => x.Notes).MaximumLength(1073741823);
-				RuleFor(x => x.CreatedDate).NotNull();
 				//
 			}
 			//

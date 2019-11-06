@@ -23,6 +23,8 @@ namespace NSG.WebSrv_Tests.Application.Commands
         private string _testName = "";
         Mock<IMediator> _mockMediator = null;
         static Mock<IApplication> _mockApplication = null;
+        static CancellationToken _cancelToken = CancellationToken.None;
+        UserServerData _user = null;
         //
         public IncidentCommands_UnitTests()
         {
@@ -43,6 +45,11 @@ namespace NSG.WebSrv_Tests.Application.Commands
             UnitTestSetup();
             _mockMediator = new Mock<IMediator>();
             _mockApplication = new Mock<IApplication>();
+            _user = new UserServerData()
+            {
+                UserName = "Phil",
+                CompanyId = 1
+            };
             //
             DatabaseSeeder _seeder = new DatabaseSeeder(db_context, userManager, roleManager);
             _seeder.Seed().Wait();
@@ -69,7 +76,14 @@ namespace NSG.WebSrv_Tests.Application.Commands
         {
             _testName = "NetworkIncidentCreateCommand_Test";
             Console.WriteLine($"{_testName} ...");
-            NetworkIncidentCreateCommandHandler _handler = new NetworkIncidentCreateCommandHandler(db_context);
+            NetworkIncidentDetailQuery _retModel =
+                new NetworkIncidentDetailQuery() { IncidentId = 2 };
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
+            _mockMediator.Setup(x => x.Send(
+                It.IsAny< NetworkIncidentDetailQueryHandler.DetailQuery> (), _cancelToken))
+                .Returns(Task.FromResult(_retModel));
+            NetworkIncidentCreateCommandHandler _handler = new NetworkIncidentCreateCommandHandler(db_context, _mockMediator.Object, _mockApplication.Object);
+            var _nld = new NetworkLogData() { NetworkLogId = 4, ServerId = 1, IncidentId = null, IPAddress = "54.183.209.144", IncidentTypeId = 3, Selected = true };
             NetworkIncidentCreateCommand _create = new NetworkIncidentCreateCommand()
             {
                 ServerId = 1,
@@ -83,9 +97,14 @@ namespace NSG.WebSrv_Tests.Application.Commands
                 Special = false,
                 Notes = "Notes",
                 CreatedDate = DateTime.Now,
+                User = _user,
+                IncidentNotes = new List<IncidentNoteData>(),
+                NetworkLogs = new List<NetworkLogData>() { _nld },
+                DeletedLogs = new List<NetworkLogData>()
             };
-            Task<Incident> _createResults = _handler.Handle(_create, CancellationToken.None);
-            Incident _entity = _createResults.Result;
+            Task<NetworkIncidentDetailQuery> _createResults = _handler.Handle(_create, CancellationToken.None);
+            Assert.IsNull(_createResults.Exception);
+            NetworkIncidentDetailQuery _entity = _createResults.Result;
             Assert.AreEqual(2, _entity.IncidentId);
         }
         //
@@ -107,8 +126,7 @@ namespace NSG.WebSrv_Tests.Application.Commands
                 Mailed = false,
                 Closed = false,
                 Special = false,
-                Notes = "Notes",
-                CreatedDate = DateTime.Now,
+                Notes = "Notes"
             };
             Task<int> _updateResults = _handler.Handle(_update, CancellationToken.None);
             int _count = _updateResults.Result;
@@ -142,24 +160,24 @@ namespace NSG.WebSrv_Tests.Application.Commands
             };
             db_context.Incidents.Add(_create);
             db_context.IncidentNotes.Add(_note);
-            db_context.SaveChanges();
-            //
+            db_context.IncidentIncidentNotes.Add(new IncidentIncidentNote()
+            {
+                Incident = _create,
+                IncidentNote = _note
+            });
             db_context.NetworkLogs.Add(new NetworkLog()
             {
                 ServerId = 1,
-                IncidentId = _create.IncidentId,
+                // Nullable Reference Types
+                Incident = _create,
                 IPAddress = "192.168.200.21",
                 NetworkLogDate = DateTime.Now,
                 Log = "Bad, bad thing are happening",
                 IncidentTypeId = 3
             });
-            db_context.IncidentIncidentNotes.Add(new IncidentIncidentNote()
-            {
-                IncidentId = _create.IncidentId,
-                IncidentNoteId = _note.IncidentNoteId
-            });
             db_context.SaveChanges();
-            _mockApplication.Setup(x => x.IsCompanyAdmin()).Returns(true);
+            //
+            _mockApplication.Setup(x => x.IsCompanyAdminRole()).Returns(true);
             //
             // Now delete what was just created ...
             IncidentDeleteCommandHandler _handler = new IncidentDeleteCommandHandler(db_context, _mockMediator.Object, _mockApplication.Object);

@@ -12,6 +12,10 @@ using FluentValidation;
 using FluentValidation.Results;
 using NSG.WebSrv.Domain.Entities;
 using NSG.WebSrv.Infrastructure.Common;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+using NSG.WebSrv.Application.Commands.Logs;
 //
 namespace NSG.WebSrv.Application.Commands.Incidents
 {
@@ -19,7 +23,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' create command, handler and handle.
 	/// </summary>
-	public class NetworkIncidentCreateCommand : IRequest<Incident>
+	public class NetworkIncidentCreateCommand : IRequest<NetworkIncidentDetailQuery>
 	{
 		public int ServerId { get; set; }
 		public string IPAddress { get; set; }
@@ -32,14 +36,26 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		public bool Special { get; set; }
 		public string Notes { get; set; }
 		public DateTime CreatedDate { get; set; }
-	}
-	//
-	/// <summary>
-	/// 'Incident' create command handler.
-	/// </summary>
-	public class NetworkIncidentCreateCommandHandler : IRequestHandler<NetworkIncidentCreateCommand, Incident>
+        //
+        public string message;
+        //
+        public List<IncidentNoteData> IncidentNotes;
+        public List<IncidentNoteData> DeletedNotes;
+        //
+        public List<NetworkLogData> NetworkLogs;
+        public List<NetworkLogData> DeletedLogs;
+        //
+        public UserServerData User;
+        //
+    }
+    //
+    /// <summary>
+    /// 'Incident' create command handler.
+    /// </summary>
+    public class NetworkIncidentCreateCommandHandler : IRequestHandler<NetworkIncidentCreateCommand, NetworkIncidentDetailQuery>
 	{
 		private readonly IDb_Context _context;
+        protected IMediator Mediator;
         private IApplication _application;
         //
         //
@@ -47,18 +63,20 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         ///  The constructor for the inner handler class, to create the Incident entity.
         /// </summary>
         /// <param name="context">The database interface context.</param>
-        public NetworkIncidentCreateCommandHandler(IDb_Context context)
-		{
-			_context = context;
-		}
-		//
-		/// <summary>
-		/// 'Incident' command handle method, passing two interfaces.
-		/// </summary>
-		/// <param name="request">This create command request.</param>
-		/// <param name="cancellationToken">Cancel token.</param>
-		/// <returns>The Incident entity class.</returns>
-		public async Task<Incident> Handle(NetworkIncidentCreateCommand request, CancellationToken cancellationToken)
+        public NetworkIncidentCreateCommandHandler(IDb_Context context, IMediator mediator, IApplication application)
+        {
+            _context = context;
+            Mediator = mediator;
+            _application = application;
+        }
+        //
+        /// <summary>
+        /// 'Incident' command handle method, passing two interfaces.
+        /// </summary>
+        /// <param name="request">This create command request.</param>
+        /// <param name="cancellationToken">Cancel token.</param>
+        /// <returns>The Incident entity class.</returns>
+        public async Task<NetworkIncidentDetailQuery> Handle(NetworkIncidentCreateCommand request, CancellationToken cancellationToken)
 		{
 			Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
@@ -67,8 +85,9 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				// Call the FluentValidationErrors extension method.
 				throw new NetworkIncidentCreateCommandValidationException(_results.FluentValidationErrors());
 			}
-			// Move from create command class to entity class.
-			var _entity = new Incident
+            System.Diagnostics.Debug.WriteLine(request.User.UserName + ' ' + request.IPAddress);
+            // Move from create command class to entity class.
+            var _entity = new Incident
 			{
 				ServerId = request.ServerId,
 				IPAddress = request.IPAddress,
@@ -83,9 +102,52 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				CreatedDate = request.CreatedDate,
 			};
 			_context.Incidents.Add(_entity);
-			await _context.SaveChangesAsync(cancellationToken);
-			// Return the entity class.
-			return _entity;
+            // int _server = request.ServerId;
+            //
+            //var _incidentIncidentNotes = new List<IncidentIncidentNote>();
+            //var _incidentNotes = new List<IncidentNote>();
+            try
+            {
+                foreach( IncidentNoteData _in in request.IncidentNotes)
+                {
+                    var _incidentNote = new IncidentNote()
+                    {
+                        NoteTypeId = _in.NoteTypeId,
+                        Note = _in.Note,
+                        CreatedDate = _in.CreatedDate
+                    };
+                    _context.IncidentNotes.Add(_incidentNote);
+                    var _incidentIncidentNote = new IncidentIncidentNote()
+                    {
+                        Incident = _entity,
+                        IncidentNote = _incidentNote
+                    };
+                    _context.IncidentIncidentNotes.Add(_incidentIncidentNote);
+                }
+                // List<NetworkLogData> networkLogs;
+                // var _networkLogs = new List<NetworkLog>();
+                foreach (NetworkLogData _nld in request.NetworkLogs.Where(_l => _l.Selected == true))
+                {
+                    NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
+                    _networkLog.Incident = _entity;
+                }
+                // List<NetworkLogData> deletedLogs;
+                foreach (NetworkLogData _nld in request.DeletedLogs)
+                {
+                    NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
+                    _context.NetworkLogs.Remove(_networkLog);
+                }
+                await _context.SaveChangesAsync(cancellationToken);
+            }
+            catch (Exception _ex)
+            {
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    _ex.GetBaseException().Message, _ex));
+                System.Diagnostics.Debug.WriteLine(_ex.ToString());
+                throw (_ex);
+            }
+            return await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = _entity.IncidentId });
 		}
 		//
 		/// <summary>
@@ -112,10 +174,15 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				RuleFor(x => x.Special).NotNull();
 				RuleFor(x => x.Notes).MaximumLength(1073741823);
 				RuleFor(x => x.CreatedDate).NotNull();
-				//
-			}
-			//
-		}
+                //
+                RuleFor(n => n.IncidentNotes).NotNull();
+                RuleFor(n => n.NetworkLogs).NotNull();
+                RuleFor(n => n.DeletedLogs).NotNull();
+                RuleFor(u => u.User).NotNull();
+                //
+            }
+            //
+        }
 		//
 	}
 	//

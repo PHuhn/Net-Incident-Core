@@ -41,19 +41,19 @@ namespace NSG.WebSrv.Infrastructure.Common
         /// Is the user in Admin role.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        bool IsAdmin();
+        bool IsAdminRole();
         //
         /// <summary>
         /// Is the user in either Admin or CompanyAdmin roles.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        bool IsCompanyAdmin();
+        bool IsCompanyAdminRole();
         //
         /// <summary>
         /// Is the user in either Admin or CompanyAdmin roles.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        bool IsEditable();
+        bool IsEditableRole();
         //
     }
 }

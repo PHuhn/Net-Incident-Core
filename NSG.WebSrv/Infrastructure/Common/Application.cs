@@ -81,17 +81,20 @@ namespace NSG.WebSrv.Infrastructure.Common
         //  User            has create and edit of incidents for given company/server
         //  CompanyAdmin    has create, edit and delete of incidents for given company/server
         //  Admin           administrator
+        static string adminRole = "admin";
+        static string companyadminRole = "companyadmin";
+        static string userRole = "user";
         //
         /// <summary>
         /// Is the user in Admin role.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        public bool IsAdmin()
+        public bool IsAdminRole()
         {
             bool _admin = false;
             ClaimsPrincipal _claimsPrincipal = GetUserClaimsPrincipal();
             if (_claimsPrincipal.Identity.IsAuthenticated)
-                _admin = _claimsPrincipal.IsInRole("admin");
+                _admin = _claimsPrincipal.IsInRole(adminRole);
             return _admin;
         }
         //
@@ -99,15 +102,15 @@ namespace NSG.WebSrv.Infrastructure.Common
         /// Is the user in either Admin or CompanyAdmin roles.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        public bool IsCompanyAdmin()
+        public bool IsCompanyAdminRole()
         {
             bool _company = false;
             ClaimsPrincipal _claimsPrincipal = GetUserClaimsPrincipal();
             if (_claimsPrincipal.Identity.IsAuthenticated)
             {
-                _company = IsAdmin();
+                _company = IsAdminRole();
                 if (!_company)
-                    _company = _claimsPrincipal.IsInRole("companyadmin");
+                    _company = _claimsPrincipal.IsInRole(companyadminRole);
             }
             return _company;
         }
@@ -116,17 +119,17 @@ namespace NSG.WebSrv.Infrastructure.Common
         /// Is the user in either Admin or CompanyAdmin roles.
         /// </summary>
         /// <returns>boolean value if user is in role.</returns>
-        public bool IsEditable()
+        public bool IsEditableRole()
         {
             bool _editable = false;
             ClaimsPrincipal _claimsPrincipal = GetUserClaimsPrincipal();
             if (_claimsPrincipal.Identity.IsAuthenticated)
             {
-                _editable = IsAdmin();
+                _editable = IsAdminRole();
                 if (!_editable)
-                    _editable = _claimsPrincipal.IsInRole("companyadmin");
+                    _editable = _claimsPrincipal.IsInRole(companyadminRole);
                 if (!_editable)
-                    _editable = _claimsPrincipal.IsInRole("user");
+                    _editable = _claimsPrincipal.IsInRole(userRole);
             }
             return _editable;
         }
