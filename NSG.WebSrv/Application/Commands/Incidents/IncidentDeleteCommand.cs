@@ -81,7 +81,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
             List<NetworkLog> _logs = _context.NetworkLogs.Where(_r => _r.IncidentId == request.IncidentId).ToList();
             foreach (NetworkLog _log in _logs)
             {
-                _log.IncidentId = 0;
+                _log.IncidentId = null;
                 _return++;
             }
             List<IncidentIncidentNote> _notes = _entity.IncidentIncidentNotes.ToList();
@@ -91,16 +91,17 @@ namespace NSG.WebSrv.Application.Commands.Incidents
                 if(_count == 0)
                 {
                     // multiply linked
+                    _context.IncidentNotes.Remove(_note.IncidentNote);
                     _context.IncidentIncidentNotes.Remove(_note);
                 }
                 _return++;
             }
             _return++;      // one row updated
             _context.Incidents.Remove(_entity);
-			await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted Incident: " + _entity.IncidentToString(), Exception = null });
+            await _context.SaveChangesAsync(cancellationToken);
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted Incident: " + _entity.IncidentToString(), null ));
             // Return the row count affected.
             return _return;
 		}

@@ -78,9 +78,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             }
 			//
 			await _userManager.DeleteAsync(_entity);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted User: " + _entity.ApplicationUserToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted User: " + _entity.ApplicationUserToString(), null));
             // Return the row count affected.
             return 1;
 		}

@@ -71,10 +71,9 @@ namespace NSG.WebSrv.Application.Commands.CompanyEmailTemplates
 			_context.EmailTemplates.Remove(_entity);
 			await _context.SaveChangesAsync(cancellationToken);
             // Log what was deleted
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted CompanyEmailTemplate: " + _entity.EmailTemplateToString(),
-                Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted CompanyEmailTemplate: " + _entity.EmailTemplateToString(), null ));
             // Return the row count affected.
             return 1;
 		}

@@ -93,11 +93,10 @@ namespace NSG.Integration.Helpers
             //
             try
             {
-                // new NetworkLog() { ServerId = serverId, IncidentId = null, IPAddress = "94.41.54.105", NetworkLogDate = _dt.AddMilliseconds(15), Log = "Fake log 1, Fake log 1, Fake log 1", IncidentTypeId = _incTypeSql },
                 Incident _inc = new Incident()
                 {
                     ServerId = serverId,
-                    IPAddress = "94.41.54.105",
+                    IPAddress = "94.41.53.106",
                     NIC_Id = "ripe.net",
                     NetworkName = "UBN Network",
                     AbuseEmailAddress = "abuse@AbuseEmailAddress.com",
@@ -112,13 +111,25 @@ namespace NSG.Integration.Helpers
                 IncidentNote _incNote = new IncidentNote()
                 {
                     NoteTypeId = pingNoteId,
-                    Note = "Pinging 94.41.54.105 with 32 bytes of data:",
+                    Note = "Pinging 94.41.53.106 with 32 bytes of data:",
                     CreatedDate = DateTime.Now
                 };
                 _context.IncidentNotes.Add(_incNote);
                 await _context.SaveChangesAsync(CancellationToken.None);
+                //
                 _context.IncidentIncidentNotes.Add(new IncidentIncidentNote() {
                     IncidentId = _inc.IncidentId, IncidentNoteId = _incNote.IncidentNoteId });
+                // NetworkLog
+                DateTime _dt = DateTime.Now.AddDays(-1);
+                int _incTypeSql = 3;
+                _context.NetworkLogs.AddRange(
+                    new NetworkLog() { ServerId = serverId, IncidentId = _inc.IncidentId, IPAddress = "94.41.53.106", NetworkLogDate = _dt.AddMilliseconds(15), Log = "Fake log 1, Fake log 1, Fake log 1", IncidentTypeId = _incTypeSql },
+                    new NetworkLog() { ServerId = serverId, IncidentId = _inc.IncidentId, IPAddress = "94.41.53.106", NetworkLogDate = _dt.AddMilliseconds(15), Log = "Fake log 1, Fake log 1, Fake log 1", IncidentTypeId = _incTypeSql }
+                    //new NetworkLog() { ServerId = serverId, IncidentId = null, IPAddress = "104.42.229.49", NetworkLogDate = _dt.AddMinutes(4), Log = "Fake log 2, Fake log 2, Fake log 2", IncidentTypeId = _incTypeSql },
+                    //new NetworkLog() { ServerId = serverId, IncidentId = null, IPAddress = "104.42.229.49", NetworkLogDate = _dt.AddMinutes(5), Log = "Fake log 3, Fake log 3, Fake log 3", IncidentTypeId = _incTypeSql },
+                    //new NetworkLog() { ServerId = serverId, IncidentId = null, IPAddress = "54.183.209.144", NetworkLogDate = _dt.AddMinutes(10), Log = "Fake log 4, Fake log 4, Fake log 4", IncidentTypeId = _incTypeSql }
+                );
+                //
                 await _context.SaveChangesAsync(CancellationToken.None);
                 //
             }

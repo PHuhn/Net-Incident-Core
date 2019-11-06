@@ -85,10 +85,9 @@ namespace NSG.WebSrv.Application.Commands.IncidentNotes
             }
             _context.IncidentNotes.Remove(_entity);
 			await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted IncidentNote: " + _entity.IncidentNoteToString(),
-                Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted IncidentNote: " + _entity.IncidentNoteToString(), null ));
             // Return the row count affected.
             return 1;
 		}

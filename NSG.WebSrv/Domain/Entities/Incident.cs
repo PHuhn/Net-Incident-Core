@@ -46,6 +46,8 @@ namespace NSG.WebSrv.Domain.Entities
         public Server Server { get; set; }
         public virtual ICollection<IncidentIncidentNote> IncidentIncidentNotes { get; }
             = new List<IncidentIncidentNote>();
+        public virtual ICollection<NetworkLog> NetworkLogs { get; }
+            = new List<NetworkLog>();
         //
     }
 }

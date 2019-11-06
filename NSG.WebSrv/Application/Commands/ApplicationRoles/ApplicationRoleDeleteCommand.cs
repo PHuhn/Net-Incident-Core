@@ -76,13 +76,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationRoles
             }
             //
             var result = await _roleManager.DeleteAsync(_entity);
-            await Mediator.Send(new LogCreateCommand()
-            {
-                Level = LoggingLevel.Warning,
-                Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted Role: " + _entity.ApplicationRoleToString(),
-                Exception = null
-            });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted Role: " + _entity.ApplicationRoleToString(), null));
             // Return the row count affected.
             return 1;
 		}

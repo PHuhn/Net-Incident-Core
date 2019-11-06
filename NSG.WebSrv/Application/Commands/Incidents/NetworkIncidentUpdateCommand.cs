@@ -20,7 +20,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' update command, handler and handle.
 	/// </summary>
-	public class IncidentUpdateCommand : IRequest<int>
+	public class NetworkIncidentUpdateCommand : IRequest<int>
 	{
 		public long IncidentId { get; set; }
 		public int ServerId { get; set; }
@@ -39,7 +39,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' update command handler.
 	/// </summary>
-	public class IncidentUpdateCommandHandler : IRequestHandler<IncidentUpdateCommand, int>
+	public class NetworkIncidentUpdateCommandHandler : IRequestHandler<NetworkIncidentUpdateCommand, int>
 	{
 		private readonly IDb_Context _context;
         private IApplication _application;
@@ -48,7 +48,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         ///  The constructor for the inner handler class, to update the Incident entity.
         /// </summary>
         /// <param name="context">The database interface context.</param>
-        public IncidentUpdateCommandHandler(IDb_Context context)
+        public NetworkIncidentUpdateCommandHandler(IDb_Context context)
 		{
 			_context = context;
 		}
@@ -59,20 +59,20 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		/// <param name="request">This update command request.</param>
 		/// <param name="cancellationToken">Cancel token.</param>
 		/// <returns>Returns the row count.</returns>
-		public async Task<int> Handle(IncidentUpdateCommand request, CancellationToken cancellationToken)
+		public async Task<int> Handle(NetworkIncidentUpdateCommand request, CancellationToken cancellationToken)
 		{
 			Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
 			if (!_results.IsValid)
 			{
 				// Call the FluentValidationErrors extension method.
-				throw new UpdateCommandValidationException(_results.FluentValidationErrors());
+				throw new NetworkIncidentUpdateCommandValidationException(_results.FluentValidationErrors());
 			}
 			var _entity = await _context.Incidents
 				.SingleOrDefaultAsync(r => r.IncidentId == request.IncidentId, cancellationToken);
 			if (_entity == null)
 			{
-				throw new UpdateCommandKeyNotFoundException(request.IncidentId);
+				throw new NetworkIncidentUpdateCommandKeyNotFoundException(request.IncidentId);
 			}
 			// Move from update command class to entity class.
 			_entity.ServerId = request.ServerId;
@@ -93,13 +93,13 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		}
 		//
 		/// <summary>
-		/// FluentValidation of the 'IncidentUpdateCommand' class.
+		/// FluentValidation of the 'NetworkIncidentUpdateCommand' class.
 		/// </summary>
-		public class Validator : AbstractValidator<IncidentUpdateCommand>
+		public class Validator : AbstractValidator<NetworkIncidentUpdateCommand>
 		{
 			//
 			/// <summary>
-			/// Constructor that will invoke the 'IncidentUpdateCommand' validator.
+			/// Constructor that will invoke the 'NetworkIncidentUpdateCommand' validator.
 			/// </summary>
 			public Validator()
 			{
@@ -124,33 +124,33 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	}
 	//
 	/// <summary>
-	/// Custom IncidentUpdateCommand record not found exception.
+	/// Custom NetworkIncidentUpdateCommand record not found exception.
 	/// </summary>
-	public class UpdateCommandKeyNotFoundException: KeyNotFoundException
+	public class NetworkIncidentUpdateCommandKeyNotFoundException : KeyNotFoundException
 	{
 		//
 		/// <summary>
-		/// Implementation of IncidentUpdateCommand record not found exception.
+		/// Implementation of NetworkIncidentUpdateCommand record not found exception.
 		/// </summary>
 		/// <param name="id">The key for the record.</param>
-		public UpdateCommandKeyNotFoundException(long incidentId)
-			: base($"IncidentUpdateCommand key not found exception: id: {incidentId}")
+		public NetworkIncidentUpdateCommandKeyNotFoundException(long incidentId)
+			: base($"NetworkIncidentUpdateCommand key not found exception: id: {incidentId}")
 		{
 		}
 	}
 	//
 	/// <summary>
-	/// Custom IncidentUpdateCommand validation exception.
+	/// Custom NetworkIncidentUpdateCommand validation exception.
 	/// </summary>
-	public class UpdateCommandValidationException: Exception
+	public class NetworkIncidentUpdateCommandValidationException : Exception
 	{
 		//
 		/// <summary>
-		/// Implementation of IncidentUpdateCommand validation exception.
+		/// Implementation of NetworkIncidentUpdateCommand validation exception.
 		/// </summary>
 		/// <param name="errorMessage">The validation error messages.</param>
-		public UpdateCommandValidationException(string errorMessage)
-			: base($"IncidentUpdateCommand validation exception: errors: {errorMessage}")
+		public NetworkIncidentUpdateCommandValidationException(string errorMessage)
+			: base($"NetworkIncidentUpdateCommand validation exception: errors: {errorMessage}")
 		{
 		}
 	}

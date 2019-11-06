@@ -22,10 +22,36 @@ namespace NSG.WebSrv.Application.Commands.Logs
 	/// </summary>
 	public class LogCreateCommand : IRequest<LogData>
 	{
-        public LoggingLevel Level { get; set; }
-        public MethodBase Method { get; set; }
+        //
+        public byte LogLevel { get; set; }
+        public string Level { get; set; }
+        public string Method { get; set; }
 		public string Message { get; set; }
-		public Exception Exception { get; set; }
+		public string Exception { get; set; }
+        //
+        public LogCreateCommand(LoggingLevel level, MethodBase method, string message, Exception exception = null)
+        {
+            LogLevel = (byte)level;
+            Level = level.GetName();
+            Method = method.DeclaringType.FullName + "." + method.Name;
+            Message = message;
+            Exception = (exception == null ? "" : exception.ToString());
+        }
+        //
+        public LogCreateCommand(byte severity, string method, string message, string exception = "")
+        {
+            LoggingLevel _logLevel = (LoggingLevel)severity;
+            LogLevel = severity;
+            Level = _logLevel.GetName();
+            if (Level is null)
+            {
+                Level = $"Level-{severity}";
+            }
+            Method = method;
+            Message = message;
+            Exception = (exception == null ? "" : exception);
+        }
+        //
     }
     //
     /// <summary>
@@ -61,19 +87,17 @@ namespace NSG.WebSrv.Application.Commands.Logs
 				// Call the FluentValidationErrors extension method.
 				throw new CreateCommandValidationException(_results.FluentValidationErrors());
 			}
-            string _method = request.Method.DeclaringType.FullName + "." + request.Method.Name;
-            string _exception = (request.Exception == null ? "" : request.Exception.ToString());
             // Move from create command class to entity class.
             var _entity = new LogData
 			{
 				Date = _application.Now(),
 				Application = _application.GetApplicationName(),
-                Method = (_method.Length > 255 ? _method.Substring(0, 255) : _method),
-                LogLevel = (byte)request.Level,
-                Level = Enum.GetName(request.Level.GetType(), request.Level),
+                Method = (request.Method.Length > 255 ? request.Method.Substring(0, 255) : request.Method),
+                LogLevel = request.LogLevel,
+                Level = request.Level,
                 UserAccount = _application.GetUserAccount(),
                 Message = (request.Message.Length > 4000 ? request.Message.Substring(0, 4000) : request.Message),
-				Exception = _exception.Length > 4000 ? _exception.Substring(0, 4000) : _exception
+				Exception = request.Exception.Length > 4000 ? request.Exception.Substring(0, 4000) : request.Exception
             };
             _context.Logs.Add(_entity);
 			await _context.SaveChangesAsync(cancellationToken);

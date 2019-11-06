@@ -78,9 +78,9 @@ namespace NSG.WebSrv.Application.Commands.NICs
             //
             _context.NICs.Remove(_entity);
 			await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted Commpany : " + _entity.NICToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted Commpany : " + _entity.NICToString(), null ));
             // Return the row count affected.
             return 1;
 		}

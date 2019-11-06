@@ -35,7 +35,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
     ///  Created Date: 2018-12-19 20:42:28
 	/// </summary>
 	public class IncidentListQuery
-	{
+    {
 		[System.ComponentModel.DataAnnotations.Key]
 		public long IncidentId { get; set; }
 		public int ServerId { get; set; }

@@ -77,9 +77,9 @@ namespace NSG.WebSrv.Application.Commands.IncidentTypes
             _context.IncidentTypes.Remove(_entity);
 			await _context.SaveChangesAsync(cancellationToken);
             // Log what was deleted
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted IncidentType: " + _entity.IncidentTypeToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted IncidentType: " + _entity.IncidentTypeToString(), null));
             // Return the row count affected.
             return 1;
 		}

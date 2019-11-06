@@ -76,9 +76,9 @@ namespace NSG.WebSrv.Application.Commands.NoteTypes
             //
             _context.NoteTypes.Remove(_entity);
 			await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted NoteType: " + _entity.NoteTypeToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted NoteType: " + _entity.NoteTypeToString(), null));
             // Return the row count affected.
             return 1;
 		}

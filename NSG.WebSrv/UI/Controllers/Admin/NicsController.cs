@@ -77,9 +77,9 @@ namespace NSG.WebSrv.UI.Controllers.Admin
             }
             catch (Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Error, Method = MethodBase.GetCurrentMethod(),
-                    Message = _ex.Message, Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Error, MethodBase.GetCurrentMethod(),
+                    _ex.Message, _ex));
                 Base_AddErrors(_ex);
             }
             return RedirectToAction("Create");
@@ -124,9 +124,9 @@ namespace NSG.WebSrv.UI.Controllers.Admin
             }
             catch (Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Error, Method = MethodBase.GetCurrentMethod(),
-                    Message = _ex.Message, Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Error, MethodBase.GetCurrentMethod(),
+                    _ex.Message, _ex));
                 Base_AddErrors(_ex);
             }
             return View();
@@ -158,9 +158,9 @@ namespace NSG.WebSrv.UI.Controllers.Admin
             }
             catch (Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Error, Method = MethodBase.GetCurrentMethod(),
-                    Message = _ex.Message, Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Error, MethodBase.GetCurrentMethod(),
+                    _ex.Message, _ex));
                 Base_AddErrors(_ex);
             }
             return RedirectToAction("Delete", new { id = id });

@@ -4,8 +4,6 @@ using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Collections.Generic;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Moq;
 using MediatR;
 //
@@ -66,24 +64,140 @@ namespace NSG.WebSrv_Tests.Application.Commands
             db_context.SaveChanges();
         }
         //
-        //
         [TestMethod]
-        public void LogCreateCommand_Test()
+        public async Task LogCreateCommand_Simple01_TestAsync()
         {
+            string _message = "Message";
+            MethodBase _method = MethodBase.GetCurrentMethod();
+            string _expectedMethod = "NSG.WebSrv_Tests.Application.Commands.LogCommands_UnitTests";
             _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
             _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
             _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
             LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
-            LogCreateCommand _create = new LogCreateCommand()
-            {
-                Method = MethodBase.GetCurrentMethod(),
-                Level = LoggingLevel.Warning,
-                Message = "Message",
-                Exception = null
-            };
-            Task<LogData> _createResults = _handler.Handle(_create, CancellationToken.None);
-            LogData _entity = _createResults.Result;
+            LogCreateCommand _create = new LogCreateCommand(
+                LoggingLevel.Warning, _method, _message, null);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
             Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual((byte)2, _entity.LogLevel);
+            Assert.AreEqual("Warning", _entity.Level);
+            Assert.AreEqual(_expectedMethod, _entity.Method.Substring(0, _expectedMethod.Length));
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual("", _entity.Exception);
+        }
+        //
+        [TestMethod]
+        public async Task LogCreateCommand_Simple02_Test()
+        {
+            string _message = "Message";
+            string _method = "MethodBase";
+            byte _severity = 2;
+            _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
+            _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
+            _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
+            LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
+            LogCreateCommand _create = new LogCreateCommand(
+                _severity, _method, _message, null);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
+            Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual(_severity, _entity.LogLevel);
+            Assert.AreEqual("Warning", _entity.Level);
+            Assert.AreEqual(_method, _entity.Method);
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual("", _entity.Exception);
+        }
+        //
+        [TestMethod]
+        public async Task LogCreateCommand_Error01_TestAsync()
+        {
+            string _message = "Message";
+            MethodBase _method = MethodBase.GetCurrentMethod();
+            Exception _exception = new Exception("Test exception");
+            string _expectedMethod = "NSG.WebSrv_Tests.Application.Commands.LogCommands_UnitTests";
+            _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
+            _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
+            _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
+            LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
+            LogCreateCommand _create = new LogCreateCommand(
+                LoggingLevel.Error, _method, _message, _exception);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
+            Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual((byte)1, _entity.LogLevel);
+            Assert.AreEqual("Error", _entity.Level);
+            Assert.AreEqual(_expectedMethod, _entity.Method.Substring(0, _expectedMethod.Length));
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual("System.Exception: Test exception", _entity.Exception);
+        }
+        //
+        [TestMethod]
+        public async Task LogCreateCommand_Error02_Test()
+        {
+            string _message = "Message";
+            string _method = "MethodBase";
+            byte _severity = 1;
+            string _exception = "System.Exception: Test exception";
+            _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
+            _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
+            _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
+            LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
+            LogCreateCommand _create = new LogCreateCommand(
+                _severity, _method, _message, _exception);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
+            Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual(_severity, _entity.LogLevel);
+            Assert.AreEqual("Error", _entity.Level);
+            Assert.AreEqual(_method, _entity.Method);
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual(_exception, _entity.Exception);
+        }
+        //
+        [TestMethod]
+        public async Task LogCreateCommand_Audit_Test()
+        {
+            string _message = "Message";
+            string _method = "MethodBase";
+            byte _severity = 0;
+            string _exception = "System.Exception: Test exception";
+            _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
+            _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
+            _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
+            LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
+            LogCreateCommand _create = new LogCreateCommand(
+                _severity, _method, _message, _exception);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
+            Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual(_severity, _entity.LogLevel);
+            Assert.AreEqual("Audit", _entity.Level);
+            Assert.AreEqual(_method, _entity.Method);
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual(_exception, _entity.Exception);
+        }
+        //
+        [TestMethod]
+        public async Task LogCreateCommand_IncorrectSeverity_Test()
+        {
+            string _message = "Message";
+            string _method = "MethodBase";
+            byte _severity = 9;
+            string _exception = "System.Exception: Test exception";
+            _mockApplication.Setup(x => x.Now()).Returns(DateTime.Now);
+            _mockApplication.Setup(x => x.GetApplicationName()).Returns("The Application!");
+            _mockApplication.Setup(x => x.GetUserAccount()).Returns("Phil");
+            LogCreateCommandHandler _handler = new LogCreateCommandHandler(db_context, _mockApplication.Object);
+            LogCreateCommand _create = new LogCreateCommand(
+                _severity, _method, _message, _exception);
+            LogData _entity = await _handler.Handle(_create, CancellationToken.None);
+            Console.WriteLine(_entity.LogToString());
+            Assert.AreEqual(3, _entity.Id);
+            Assert.AreEqual(_severity, _entity.LogLevel);
+            Assert.AreEqual("Level-9", _entity.Level);
+            Assert.AreEqual(_method, _entity.Method);
+            Assert.AreEqual(_message, _entity.Message);
+            Assert.AreEqual(_exception, _entity.Exception);
         }
         //
         [TestMethod]

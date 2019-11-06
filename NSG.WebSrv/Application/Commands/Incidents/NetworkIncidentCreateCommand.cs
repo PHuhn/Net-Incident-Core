@@ -19,7 +19,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' create command, handler and handle.
 	/// </summary>
-	public class IncidentCreateCommand : IRequest<Incident>
+	public class NetworkIncidentCreateCommand : IRequest<Incident>
 	{
 		public int ServerId { get; set; }
 		public string IPAddress { get; set; }
@@ -37,7 +37,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' create command handler.
 	/// </summary>
-	public class IncidentCreateCommandHandler : IRequestHandler<IncidentCreateCommand, Incident>
+	public class NetworkIncidentCreateCommandHandler : IRequestHandler<NetworkIncidentCreateCommand, Incident>
 	{
 		private readonly IDb_Context _context;
         private IApplication _application;
@@ -47,7 +47,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         ///  The constructor for the inner handler class, to create the Incident entity.
         /// </summary>
         /// <param name="context">The database interface context.</param>
-        public IncidentCreateCommandHandler(IDb_Context context)
+        public NetworkIncidentCreateCommandHandler(IDb_Context context)
 		{
 			_context = context;
 		}
@@ -58,14 +58,14 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		/// <param name="request">This create command request.</param>
 		/// <param name="cancellationToken">Cancel token.</param>
 		/// <returns>The Incident entity class.</returns>
-		public async Task<Incident> Handle(IncidentCreateCommand request, CancellationToken cancellationToken)
+		public async Task<Incident> Handle(NetworkIncidentCreateCommand request, CancellationToken cancellationToken)
 		{
 			Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
 			if (!_results.IsValid)
 			{
 				// Call the FluentValidationErrors extension method.
-				throw new CreateCommandValidationException(_results.FluentValidationErrors());
+				throw new NetworkIncidentCreateCommandValidationException(_results.FluentValidationErrors());
 			}
 			// Move from create command class to entity class.
 			var _entity = new Incident
@@ -89,13 +89,13 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		}
 		//
 		/// <summary>
-		/// FluentValidation of the 'IncidentCreateCommand' class.
+		/// FluentValidation of the 'NetworkIncidentCreateCommand' class.
 		/// </summary>
-		public class Validator : AbstractValidator<IncidentCreateCommand>
+		public class Validator : AbstractValidator<NetworkIncidentCreateCommand>
 		{
 			//
 			/// <summary>
-			/// Constructor that will invoke the 'IncidentCreateCommand' validator.
+			/// Constructor that will invoke the 'NetworkIncidentCreateCommand' validator.
 			/// </summary>
 			public Validator()
 			{
@@ -120,17 +120,17 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	}
 	//
 	/// <summary>
-	/// Custom IncidentCreateCommand validation exception.
+	/// Custom NetworkIncidentCreateCommand validation exception.
 	/// </summary>
-	public class CreateCommandValidationException: Exception
+	public class NetworkIncidentCreateCommandValidationException: Exception
 	{
 		//
 		/// <summary>
-		/// Implementation of IncidentCreateCommand validation exception.
+		/// Implementation of NetworkIncidentCreateCommand validation exception.
 		/// </summary>
 		/// <param name="errorMessage">The validation error messages.</param>
-		public CreateCommandValidationException(string errorMessage)
-			: base($"IncidentCreateCommand validation exception: errors: {errorMessage}")
+		public NetworkIncidentCreateCommandValidationException(string errorMessage)
+			: base($"NetworkIncidentCreateCommand validation exception: errors: {errorMessage}")
 		{
 		}
 	}

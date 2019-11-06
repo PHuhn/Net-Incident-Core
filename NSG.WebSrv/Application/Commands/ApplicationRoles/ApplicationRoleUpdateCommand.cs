@@ -74,9 +74,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationRoles
 			_entity.Name = request.Name;
             //
             await _roleManager.UpdateAsync(_entity);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Updated Role: " + _updateMessage, Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Updated Role: " + _updateMessage, null ));
             // Return the row count.
             return 1;
 		}

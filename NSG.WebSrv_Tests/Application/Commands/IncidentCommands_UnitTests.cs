@@ -12,6 +12,7 @@ using NSG.WebSrv_Tests.Helpers;
 using NSG.WebSrv.Application.Commands.Incidents;
 using NSG.Integration.Helpers;
 using NSG.WebSrv.Infrastructure.Common;
+using Microsoft.EntityFrameworkCore;
 //
 namespace NSG.WebSrv_Tests.Application.Commands
 {
@@ -35,7 +36,7 @@ namespace NSG.WebSrv_Tests.Application.Commands
         }
         //
         [TestInitialize]
-        public void TestInitialize()
+        public async Task TestInitializeAsync()
         {
             Console.WriteLine("TestInitialize");
             //
@@ -45,21 +46,31 @@ namespace NSG.WebSrv_Tests.Application.Commands
             //
             DatabaseSeeder _seeder = new DatabaseSeeder(db_context, userManager, roleManager);
             _seeder.Seed().Wait();
-            foreach(Incident _in in db_context.Incidents)
+            foreach(Incident _in in db_context.Incidents.Include(_i => _i.IncidentIncidentNotes))
             {
                 Console.WriteLine(_in.IncidentId.ToString() + " " + _in.IPAddress);
             }
+            Incident _inc = await db_context.Incidents
+                .Include(_i => _i.IncidentIncidentNotes)
+                .Include(_i => _i.Server)
+                .SingleOrDefaultAsync(r => r.IncidentId == 1);
+            foreach(IncidentIncidentNote _iin in _inc.IncidentIncidentNotes)
+            {
+                Console.WriteLine(_iin.IncidentNote.IncidentNoteId.ToString() + " " + _iin.IncidentNote.NoteTypeId.ToString());
+            }
+            //.ThenInclude(IncidentIncidentNotes => IncidentIncidentNotes.IncidentNote)
+
         }
         //
         // You will need to check that the indexes work with you test data.
         //
         [TestMethod]
-        public void IncidentCreateCommand_Test()
+        public void NetworkIncidentCreateCommand_Test()
         {
-            _testName = "IncidentCreateCommand_Test";
+            _testName = "NetworkIncidentCreateCommand_Test";
             Console.WriteLine($"{_testName} ...");
-            IncidentCreateCommandHandler _handler = new IncidentCreateCommandHandler(db_context);
-            IncidentCreateCommand _create = new IncidentCreateCommand()
+            NetworkIncidentCreateCommandHandler _handler = new NetworkIncidentCreateCommandHandler(db_context);
+            NetworkIncidentCreateCommand _create = new NetworkIncidentCreateCommand()
             {
                 ServerId = 1,
                 IPAddress = "11.10.10.10",
@@ -79,12 +90,12 @@ namespace NSG.WebSrv_Tests.Application.Commands
         }
         //
         [TestMethod]
-        public void IncidentUpdateCommand_Test()
+        public void NetworkIncidentUpdateCommand_Test()
         {
-            _testName = "IncidentUpdateCommand_Test";
+            _testName = "NetworkIncidentUpdateCommand_Test";
             Console.WriteLine($"{_testName} ...");
-            IncidentUpdateCommandHandler _handler = new IncidentUpdateCommandHandler(db_context);
-            IncidentUpdateCommand _update = new IncidentUpdateCommand()
+            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(db_context);
+            NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand()
             {
                 IncidentId = 1,
                 ServerId = 1,
@@ -162,17 +173,32 @@ namespace NSG.WebSrv_Tests.Application.Commands
         }
         //
         [TestMethod]
-        public async Task IncidentDetailQuery_Test()
+        public async Task NetworkIncidentDetailQuery_Test()
         {
-            _testName = "IncidentDetailQuery_Test";
+            _testName = "NetworkIncidentDetailQuery_Test";
             Console.WriteLine($"{_testName} ...");
-            IncidentDetailQueryHandler _handler = new IncidentDetailQueryHandler(db_context);
-            IncidentDetailQueryHandler.DetailQuery _detailQuery =
-                new IncidentDetailQueryHandler.DetailQuery();
-            _detailQuery.IncidentId = 1;
-            IncidentDetailQuery _detail =
+            NetworkIncidentDetailQueryHandler _handler = new NetworkIncidentDetailQueryHandler(db_context);
+            NetworkIncidentDetailQueryHandler.DetailQuery _detailQuery =
+                new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = 1 };
+            NetworkIncidentDetailQuery _detail =
                 await _handler.Handle(_detailQuery, CancellationToken.None);
             Assert.AreEqual(1, _detail.IncidentId);
+        }
+        //
+        [TestMethod]
+        public async Task NetworkIncidentCreateQuery_Test()
+        {
+            _testName = "NetworkIncidentCreateQuery_Test";
+            Console.WriteLine($"{_testName} ...");
+            NetworkIncidentCreateQueryHandler _handler = new NetworkIncidentCreateQueryHandler(db_context);
+            NetworkIncidentCreateQueryHandler.DetailQuery _detailQuery =
+                new NetworkIncidentCreateQueryHandler.DetailQuery() { ServerId = 1 };
+            NetworkIncidentDetailQuery _detail =
+                await _handler.Handle(_detailQuery, CancellationToken.None);
+            Assert.AreEqual(1, _detail.ServerId);
+            Assert.AreEqual(11, _detail.NICs.Count);
+            Assert.AreEqual(8, _detail.IncidentTypes.Count);
+            Assert.AreEqual(5, _detail.NoteTypes.Count);
         }
         //
         [TestMethod]

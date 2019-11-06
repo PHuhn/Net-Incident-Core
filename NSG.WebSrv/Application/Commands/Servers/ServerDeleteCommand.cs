@@ -90,9 +90,9 @@ namespace NSG.WebSrv.Application.Commands.Servers
             //
             _context.Servers.Remove(_entity);
             await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted Server : " + _entity.ServerToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted Server : " + _entity.ServerToString(), null));
             // Return the row count affected.
             return 1;
         }

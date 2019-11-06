@@ -74,11 +74,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationRoles
             var _roleresult = await _roleManager.CreateAsync(_entity);
             if (_roleresult.Succeeded)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = "Created Role: " + _entity.ApplicationRoleToString(),
-                    Exception = null
-                });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    "Created Role: " + _entity.ApplicationRoleToString(), null));
                 // Return the entity class.
                 return _entity;
             }

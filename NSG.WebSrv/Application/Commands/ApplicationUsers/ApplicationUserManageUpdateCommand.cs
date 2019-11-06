@@ -78,10 +78,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
                 .FirstOrDefaultAsync(r => r.UserName == request.UserName);
             if (_entity == null)
 			{
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = $"User: {request.UserName} not found.",
-                    Exception = null });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    $"User: {request.UserName} not found.", null));
                 throw new ApplicationUserManageUpdateCommandKeyNotFoundException(request.UserName);
 			}
             // Move from update command class to entity class.

@@ -76,9 +76,9 @@ namespace NSG.WebSrv.Application.Commands.Companies
             //
             _context.Companies.Remove(_entity);
             await _context.SaveChangesAsync(cancellationToken);
-            await Mediator.Send(new LogCreateCommand() {
-                Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                Message = "Deleted Commpany : " + _entity.CompanyToString(), Exception = null });
+            await Mediator.Send(new LogCreateCommand(
+                LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                "Deleted Commpany : " + _entity.CompanyToString(), null));
             // Return the row count affected.
             return 1;
         }

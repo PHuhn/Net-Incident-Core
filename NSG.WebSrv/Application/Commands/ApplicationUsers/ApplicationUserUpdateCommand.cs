@@ -85,10 +85,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
                 .FirstOrDefaultAsync(r => r.UserName == request.UserName);
             if (_entity == null)
 			{
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = $"User: {request.UserName} not found.",
-                    Exception = null });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    $"User: {request.UserName} not found.", null ));
                 throw new ApplicationUserUpdateCommandKeyNotFoundException(request.UserName);
 			}
             // Move from update command class to entity class.
@@ -101,11 +100,6 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             await _context.SaveChangesAsync(cancellationToken);
             // Return the row count.
             return 1;
-            //if (_updateResults.Succeeded)
-            //{
-            //    return 1;
-            //}
-            //return 0;
 		}
         //
         private async Task MoveRequestToEntity(IDb_Context context, 
@@ -148,10 +142,9 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             }
             catch (Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = "Requested roles: " + string.Join(", ", request.SelectedRoles),
-                    Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    "Requested roles: " + string.Join(", ", request.SelectedRoles), _ex ));
                 throw new ApplicationUserUpdateCommandException(
                     $"User: {request.UserName}, message: {_ex.GetBaseException()}");
             }
@@ -200,10 +193,10 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             }
             catch (Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = request.UserName + ", requested roles: " + string.Join(", ", request.SelectedRoles),
-                    Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    request.UserName + ", requested roles: " + string.Join(", ", request.SelectedRoles),
+                    _ex ));
                 throw new ApplicationUserUpdateCommandException(
                     $"User: {request.UserName},  role update, message: {_ex.GetBaseException()}");
             }
@@ -250,10 +243,10 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             }
             catch ( Exception _ex)
             {
-                await Mediator.Send(new LogCreateCommand() {
-                    Level = LoggingLevel.Warning, Method = MethodBase.GetCurrentMethod(),
-                    Message = request.UserName + ", requested servers: " + string.Join(", ", request.SelectedServers),
-                    Exception = _ex });
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    request.UserName + ", requested servers: " + string.Join(", ", request.SelectedServers),
+                    _ex ));
                 throw new ApplicationUserUpdateCommandException(
                     $"User: {request.UserName},  role Server, message: {_ex.GetBaseException()}");
             }
