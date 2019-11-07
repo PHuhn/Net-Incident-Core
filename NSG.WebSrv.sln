@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NSG.Library.Helpers", "..\.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.PrimeNG.LazyLoading", "..\..\Ng\NSG.PrimeNG\NSG.PrimeNG.LazyLoading\NSG.PrimeNG.LazyLoading.csproj", "{747064F6-BD20-40EB-88B5-3B0F08A83725}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NSG.MimeKit.SendGrid.Extensions", "..\..\Ng\NSG.MimeKit\NSG.MimeKit.SendGrid.Extensions\NSG.MimeKit.SendGrid.Extensions.csproj", "{8B3D6539-6089-483A-9E19-576E430B1F72}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{747064F6-BD20-40EB-88B5-3B0F08A83725}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8B3D6539-6089-483A-9E19-576E430B1F72}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8B3D6539-6089-483A-9E19-576E430B1F72}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8B3D6539-6089-483A-9E19-576E430B1F72}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8B3D6539-6089-483A-9E19-576E430B1F72}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

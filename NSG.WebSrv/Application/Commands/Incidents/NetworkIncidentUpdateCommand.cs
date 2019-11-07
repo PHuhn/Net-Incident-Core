@@ -13,6 +13,12 @@ using FluentValidation;
 using FluentValidation.Results;
 using NSG.WebSrv.Domain.Entities;
 using NSG.WebSrv.Infrastructure.Common;
+using NSG.WebSrv.Application.Commands.Logs;
+using System.Reflection;
+using System.Linq;
+using SendGrid.Helpers.Mail;
+using Newtonsoft.Json;
+using NSG.WebSrv.Infrastructure.Notification;
 //
 namespace NSG.WebSrv.Application.Commands.Incidents
 {
@@ -20,7 +26,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	/// <summary>
 	/// 'Incident' update command, handler and handle.
 	/// </summary>
-	public class NetworkIncidentUpdateCommand : IRequest<int>
+	public class NetworkIncidentUpdateCommand : IRequest<NetworkIncidentDetailQuery>
 	{
 		public long IncidentId { get; set; }
 		public int ServerId { get; set; }
@@ -34,42 +40,47 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		public bool Special { get; set; }
 		public string Notes { get; set; }
         //
-        public string message;
+        public string Message;
         //
-        public List<IncidentNoteData> incidentNotes;
-        public List<IncidentNoteData> deletedNotes;
+        public List<IncidentNoteData> IncidentNotes;
+        public List<IncidentNoteData> DeletedNotes;
         //
-        public List<NetworkLogData> networkLogs;
-        public List<NetworkLogData> deletedLogs;
+        public List<NetworkLogData> NetworkLogs;
+        public List<NetworkLogData> DeletedLogs;
         //
-        public UserServerData user;
+        public UserServerData User;
         //
     }
     //
     /// <summary>
     /// 'Incident' update command handler.
     /// </summary>
-    public class NetworkIncidentUpdateCommandHandler : IRequestHandler<NetworkIncidentUpdateCommand, int>
+    public class NetworkIncidentUpdateCommandHandler : IRequestHandler<NetworkIncidentUpdateCommand, NetworkIncidentDetailQuery>
 	{
 		private readonly IDb_Context _context;
+        protected IMediator Mediator;
         private IApplication _application;
+        private INotificationService _notification;
         //
         /// <summary>
         ///  The constructor for the inner handler class, to update the Incident entity.
         /// </summary>
         /// <param name="context">The database interface context.</param>
-        public NetworkIncidentUpdateCommandHandler(IDb_Context context)
-		{
-			_context = context;
-		}
-		//
-		/// <summary>
-		/// 'Incident' command handle method, passing two interfaces.
-		/// </summary>
-		/// <param name="request">This update command request.</param>
-		/// <param name="cancellationToken">Cancel token.</param>
-		/// <returns>Returns the row count.</returns>
-		public async Task<int> Handle(NetworkIncidentUpdateCommand request, CancellationToken cancellationToken)
+        public NetworkIncidentUpdateCommandHandler(IDb_Context context, IMediator mediator, IApplication application, INotificationService notification)
+        {
+            _context = context;
+            Mediator = mediator;
+            _application = application;
+            _notification = notification;
+        }
+        //
+        /// <summary>
+        /// 'Incident' command handle method, passing two interfaces.
+        /// </summary>
+        /// <param name="request">This update command request.</param>
+        /// <param name="cancellationToken">Cancel token.</param>
+        /// <returns>Returns the row count.</returns>
+        public async Task<NetworkIncidentDetailQuery> Handle(NetworkIncidentUpdateCommand request, CancellationToken cancellationToken)
 		{
 			Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
@@ -78,33 +89,276 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				// Call the FluentValidationErrors extension method.
 				throw new NetworkIncidentUpdateCommandValidationException(_results.FluentValidationErrors());
 			}
-			var _entity = await _context.Incidents
-				.SingleOrDefaultAsync(r => r.IncidentId == request.IncidentId, cancellationToken);
+            string _params = $"Entering with, incidentId: {request.IncidentId}, UserName: {request.User.UserName}";
+            System.Diagnostics.Debug.WriteLine(_params);
+            //
+            var _entity = await _context.Incidents
+                .Include(_i => _i.IncidentIncidentNotes)
+				.SingleOrDefaultAsync(_r => _r.IncidentId == request.IncidentId, cancellationToken);
 			if (_entity == null)
 			{
 				throw new NetworkIncidentUpdateCommandKeyNotFoundException(request.IncidentId);
 			}
-			// Move from update command class to entity class.
-			_entity.ServerId = request.ServerId;
-			_entity.IPAddress = request.IPAddress;
-			_entity.NIC_Id = request.NIC_Id;
-			_entity.NetworkName = request.NetworkName;
-			_entity.AbuseEmailAddress = request.AbuseEmailAddress;
-			_entity.ISPTicketNumber = request.ISPTicketNumber;
-			_entity.Mailed = request.Mailed;
-			_entity.Closed = request.Closed;
-			_entity.Special = request.Special;
-			_entity.Notes = request.Notes;
-			//
-			await _context.SaveChangesAsync(cancellationToken);
-			// Return the row count.
-			return 1;
-		}
-		//
-		/// <summary>
-		/// FluentValidation of the 'NetworkIncidentUpdateCommand' class.
-		/// </summary>
-		public class Validator : AbstractValidator<NetworkIncidentUpdateCommand>
+            try
+            {
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Debug, MethodBase.GetCurrentMethod(), _params));
+                bool _mailedBefore = _entity.Mailed;
+                // Move from update command class to entity class.
+                MoveRequestToEntity(request, _entity);
+                //
+                // Add and update notes
+                await IncidentNotesAddUpdateAsync(request, _entity);
+                // Delete notes and IncidentIncidentNotes
+                IncidentNotesDelete(request, _entity);
+                // ** NetworkLogs **
+                // Update logs
+                NetworkLogsUpdate(request, _entity);
+                // Delete Logs;
+                await NetworkLogsDeleteAsync(request, _entity);
+                //
+                await _context.SaveChangesAsync(cancellationToken);
+                // "Inside, after save ... id: " + request.incident.IncidentId.ToString());
+                //
+                if (_mailedBefore == false && request.Mailed == true)
+                {
+                    await Task.Run(async () =>
+                    {
+                         await EMailIspReportAsync(request);
+                    });
+                }
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Info, MethodBase.GetCurrentMethod(),
+                    $"Inside, Saved id: {request.IncidentId}"));
+            }
+            catch (Exception _ex)
+            {
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                    _ex.GetBaseException().Message, _ex));
+                System.Diagnostics.Debug.WriteLine(_ex.ToString());
+                throw (_ex);
+            }
+            // Return the row count.
+            return await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = _entity.IncidentId });
+        }
+        //
+        #region "MoveRequestToEntity"
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        void MoveRequestToEntity(NetworkIncidentUpdateCommand request, Incident entity)
+        {
+            if( entity.ServerId != request.ServerId)
+            {
+                entity.ServerId = request.ServerId;
+            }
+            if(entity.IPAddress != request.IPAddress)
+            {
+                entity.IPAddress = request.IPAddress;
+            }
+            if (entity.NIC_Id != request.NIC_Id)
+            {
+                entity.NIC_Id = request.NIC_Id;
+            }
+            if (entity.NetworkName != request.NetworkName)
+            {
+                entity.NetworkName = request.NetworkName;
+            }
+            if (entity.AbuseEmailAddress != request.AbuseEmailAddress)
+            {
+                entity.AbuseEmailAddress = request.AbuseEmailAddress;
+            }
+            if (entity.ISPTicketNumber != request.ISPTicketNumber)
+            {
+                entity.ISPTicketNumber = request.ISPTicketNumber;
+            }
+            if (entity.Mailed != request.Mailed)
+            {
+                entity.Mailed = request.Mailed;
+            }
+            if (entity.Closed != request.Closed)
+            {
+                entity.Closed = request.Closed;
+            }
+            if (entity.Special != request.Special)
+            {
+                entity.Special = request.Special;
+            }
+            if (entity.Notes != request.Notes)
+            {
+                entity.Notes = request.Notes;
+            }
+        }
+        //
+        #endregion // MoveRequestToEntity
+        //
+        // IncidentNotesAddUpdateAsync
+        // IncidentNotesDelete
+        //
+        #region "IncidentNotes processing"
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        async Task IncidentNotesAddUpdateAsync(NetworkIncidentUpdateCommand request, Incident entity)
+        {
+            //var _incidentIncidentNotes = new List<IncidentIncidentNote>();
+            //var _incidentNotes = new List<IncidentNote>();
+            foreach (IncidentNoteData _ind in request.IncidentNotes.Where(_r => _r.IsChanged == true))
+            {
+                if (_ind.IncidentNoteId > 0)
+                {
+                    // Update notes
+                    IncidentNote _incidentNote = await _context.IncidentNotes
+                        .FirstOrDefaultAsync(_in => _in.IncidentNoteId == _ind.IncidentNoteId);
+                    if (_incidentNote.NoteTypeId != _ind.NoteTypeId)
+                    {
+                        _incidentNote.NoteTypeId = _ind.NoteTypeId;
+                    }
+                    if (_incidentNote.Note != _ind.Note)
+                    {
+                        _incidentNote.Note = _ind.Note;
+                    }
+                }
+                if (_ind.IncidentNoteId == 0)
+                {
+                    // Add notes and IncidentIncidentNotes
+                    var _incidentNote = new IncidentNote()
+                    {
+                        NoteTypeId = _ind.NoteTypeId,
+                        Note = _ind.Note,
+                        CreatedDate = _ind.CreatedDate
+                    };
+                    _context.IncidentNotes.Add(_incidentNote);
+                    var _incidentIncidentNote = new IncidentIncidentNote()
+                    {
+                        Incident = entity,
+                        IncidentNote = _incidentNote
+                    };
+                    _context.IncidentIncidentNotes.Add(_incidentIncidentNote);
+                }
+            }
+            //
+        }
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        void IncidentNotesDelete(NetworkIncidentUpdateCommand request, Incident entity)
+        {
+            foreach (IncidentNoteData _ind in request.DeletedNotes)
+            {
+                if (_ind.IncidentNoteId > 0)
+                {
+                    IncidentIncidentNote _inn = entity.IncidentIncidentNotes.FirstOrDefault(_einn => _einn.IncidentNoteId == _ind.IncidentNoteId);
+                    if( _inn != null)
+                    {
+                        _context.IncidentNotes.Remove(_inn.IncidentNote);
+                        _context.IncidentIncidentNotes.Remove(_inn);
+                    }
+                }
+            }
+            //
+        }
+        //
+        #endregion // IncidentNotes processing
+        //
+        // NetworkLogsUpdate
+        // NetworkLogsDeleteAsync
+        //
+        #region "NetworkLogs processing"
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        void NetworkLogsUpdate(NetworkIncidentUpdateCommand request, Incident entity)
+        {
+            foreach (NetworkLogData _nld in request.NetworkLogs.Where(_l => _l.IsChanged == true))
+            {
+                NetworkLog _networkLog = entity.NetworkLogs.FirstOrDefault(_r => _r.NetworkLogId == _nld.NetworkLogId);
+                if (_networkLog != null)
+                {
+                    if(_networkLog.IncidentId != _nld.IncidentId)
+                    {
+                        _networkLog.IncidentId = (_nld.IncidentId == 0 ? null : _nld.IncidentId);
+                    }
+                }
+            }
+        }
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        async Task NetworkLogsDeleteAsync(NetworkIncidentUpdateCommand request, Incident entity)
+        {
+            // Delete Logs;
+            foreach (NetworkLogData _nld in request.DeletedLogs)
+            {
+                if (_nld.Selected == false)
+                {
+                    NetworkLog _networkLog = await _context.NetworkLogs
+                        .FirstOrDefaultAsync(_in => _in.NetworkLogId == _nld.NetworkLogId);
+                    if(_networkLog != null)
+                    {
+                        _context.NetworkLogs.Remove(_networkLog);
+                    }
+                }
+            }
+            //
+        }
+        //
+        #endregion // NetworkLogs processing
+        //
+        //
+        /// <summary>
+        /// EMail the last ISP Report
+        /// </summary>
+        /// <param name="data"></param>
+        private async Task EMailIspReportAsync(NetworkIncidentUpdateCommand data)
+        {
+            Incident _incident = await _context.Incidents
+                .Include(_i => _i.IncidentIncidentNotes)
+                .FirstOrDefaultAsync(i => i.IncidentId == data.IncidentId);
+            var _note = _incident.IncidentIncidentNotes
+                .Where(_iin => _iin.IncidentNote.NoteType.NoteTypeClientScript == "email")
+                .Select(_iin => _iin.IncidentNote).FirstOrDefault();
+            if (_note != null)
+            {
+                try
+                {
+                    // translate the message from json string of sendgrid type
+                    SendGridMessage _sgm = JsonConvert.DeserializeObject<SendGridMessage>(_note.Note);
+                    await _notification.SendEmailAsync(MimeKit.SendGridExtensions.NewMimeMessage(_sgm));
+                }
+                catch (Exception _ex)
+                {
+                    await Mediator.Send(new LogCreateCommand(
+                        LoggingLevel.Warning, MethodBase.GetCurrentMethod(),
+                        _ex.GetBaseException().Message, _ex));
+                    System.Diagnostics.Debug.WriteLine(_ex.ToString());
+                    throw (_ex);
+                }
+            }
+        }
+        //
+        /// <summary>
+        /// FluentValidation of the 'NetworkIncidentUpdateCommand' class.
+        /// </summary>
+        public class Validator : AbstractValidator<NetworkIncidentUpdateCommand>
 		{
 			//
 			/// <summary>
@@ -124,10 +378,16 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				RuleFor(x => x.Closed).NotNull();
 				RuleFor(x => x.Special).NotNull();
 				RuleFor(x => x.Notes).MaximumLength(1073741823);
-				//
-			}
-			//
-		}
+                //
+                RuleFor(n => n.IncidentNotes).NotNull();
+                RuleFor(n => n.DeletedNotes).NotNull();
+                RuleFor(n => n.NetworkLogs).NotNull();
+                RuleFor(n => n.DeletedLogs).NotNull();
+                RuleFor(u => u.User).NotNull();
+                //
+            }
+            //
+        }
 		//
 	}
 	//
@@ -164,4 +424,3 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 	}
 }
 // ---------------------------------------------------------------------------
-

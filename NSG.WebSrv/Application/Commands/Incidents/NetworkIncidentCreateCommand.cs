@@ -85,45 +85,16 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 				// Call the FluentValidationErrors extension method.
 				throw new NetworkIncidentCreateCommandValidationException(_results.FluentValidationErrors());
 			}
-            System.Diagnostics.Debug.WriteLine(request.User.UserName + ' ' + request.IPAddress);
+            string _userNameIP = $"Entering with, User: {request.User.UserName}, IP: {request.IPAddress}";
+            System.Diagnostics.Debug.WriteLine(_userNameIP);
             // Move from create command class to entity class.
-            var _entity = new Incident
-			{
-				ServerId = request.ServerId,
-				IPAddress = request.IPAddress,
-				NIC_Id = request.NIC_Id,
-				NetworkName = request.NetworkName,
-				AbuseEmailAddress = request.AbuseEmailAddress,
-				ISPTicketNumber = request.ISPTicketNumber,
-				Mailed = request.Mailed,
-				Closed = request.Closed,
-				Special = request.Special,
-				Notes = request.Notes,
-				CreatedDate = request.CreatedDate,
-			};
-			_context.Incidents.Add(_entity);
-            // int _server = request.ServerId;
+            Incident _entity = CreateIncidentFromRequest(request);
+            _context.Incidents.Add(_entity);
             //
-            //var _incidentIncidentNotes = new List<IncidentIncidentNote>();
-            //var _incidentNotes = new List<IncidentNote>();
             try
             {
-                foreach( IncidentNoteData _in in request.IncidentNotes)
-                {
-                    var _incidentNote = new IncidentNote()
-                    {
-                        NoteTypeId = _in.NoteTypeId,
-                        Note = _in.Note,
-                        CreatedDate = _in.CreatedDate
-                    };
-                    _context.IncidentNotes.Add(_incidentNote);
-                    var _incidentIncidentNote = new IncidentIncidentNote()
-                    {
-                        Incident = _entity,
-                        IncidentNote = _incidentNote
-                    };
-                    _context.IncidentIncidentNotes.Add(_incidentIncidentNote);
-                }
+                // Add the IncidentNotes and link IncidentIncidentNotes
+                AddIncidentNotes(request, _entity);
                 // List<NetworkLogData> networkLogs;
                 // var _networkLogs = new List<NetworkLog>();
                 foreach (NetworkLogData _nld in request.NetworkLogs.Where(_l => _l.Selected == true))
@@ -149,11 +120,55 @@ namespace NSG.WebSrv.Application.Commands.Incidents
             }
             return await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = _entity.IncidentId });
 		}
-		//
-		/// <summary>
-		/// FluentValidation of the 'NetworkIncidentCreateCommand' class.
-		/// </summary>
-		public class Validator : AbstractValidator<NetworkIncidentCreateCommand>
+        Incident CreateIncidentFromRequest(NetworkIncidentCreateCommand request)
+        {
+            return new Incident
+            {
+                ServerId = request.ServerId,
+                IPAddress = request.IPAddress,
+                NIC_Id = request.NIC_Id,
+                NetworkName = request.NetworkName,
+                AbuseEmailAddress = request.AbuseEmailAddress,
+                ISPTicketNumber = request.ISPTicketNumber,
+                // cannot mail or close incident on creation
+                Mailed = false, // request.Mailed (need IncidentId),
+                Closed = false, // request.Closed,
+                Special = request.Special,
+                Notes = request.Notes,
+                CreatedDate = request.CreatedDate,
+            };
+        }
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        void AddIncidentNotes(NetworkIncidentCreateCommand request, Incident entity)
+        {
+            //var _incidentIncidentNotes = new List<IncidentIncidentNote>();
+            //var _incidentNotes = new List<IncidentNote>();
+            foreach (IncidentNoteData _ind in request.IncidentNotes)
+            {
+                var _incidentNote = new IncidentNote()
+                {
+                    NoteTypeId = _ind.NoteTypeId,
+                    Note = _ind.Note,
+                    CreatedDate = _ind.CreatedDate
+                };
+                _context.IncidentNotes.Add(_incidentNote);
+                var _incidentIncidentNote = new IncidentIncidentNote()
+                {
+                    Incident = entity,
+                    IncidentNote = _incidentNote
+                };
+                _context.IncidentIncidentNotes.Add(_incidentIncidentNote);
+            }
+        }
+        //
+        /// <summary>
+        /// FluentValidation of the 'NetworkIncidentCreateCommand' class.
+        /// </summary>
+        public class Validator : AbstractValidator<NetworkIncidentCreateCommand>
 		{
 			//
 			/// <summary>

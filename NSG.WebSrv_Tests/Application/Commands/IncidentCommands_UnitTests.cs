@@ -13,6 +13,7 @@ using NSG.WebSrv.Application.Commands.Incidents;
 using NSG.Integration.Helpers;
 using NSG.WebSrv.Infrastructure.Common;
 using Microsoft.EntityFrameworkCore;
+using NSG.WebSrv.Infrastructure.Notification;
 //
 namespace NSG.WebSrv_Tests.Application.Commands
 {
@@ -23,6 +24,7 @@ namespace NSG.WebSrv_Tests.Application.Commands
         private string _testName = "";
         Mock<IMediator> _mockMediator = null;
         static Mock<IApplication> _mockApplication = null;
+        static Mock<INotificationService> _mockNotification = null;
         static CancellationToken _cancelToken = CancellationToken.None;
         UserServerData _user = null;
         //
@@ -45,6 +47,7 @@ namespace NSG.WebSrv_Tests.Application.Commands
             UnitTestSetup();
             _mockMediator = new Mock<IMediator>();
             _mockApplication = new Mock<IApplication>();
+            _mockNotification = new Mock<INotificationService>();
             _user = new UserServerData()
             {
                 UserName = "Phil",
@@ -113,7 +116,16 @@ namespace NSG.WebSrv_Tests.Application.Commands
         {
             _testName = "NetworkIncidentUpdateCommand_Test";
             Console.WriteLine($"{_testName} ...");
-            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(db_context);
+            long _incidentId = 1;
+            NetworkIncidentDetailQuery _retModel =
+                new NetworkIncidentDetailQuery() { IncidentId = _incidentId };
+            _mockMediator.Setup(x => x.Send(
+                It.IsAny<NetworkIncidentDetailQueryHandler.DetailQuery>(), _cancelToken))
+                .Returns(Task.FromResult(_retModel));
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
+            //_notification = notification;
+            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(
+                db_context, _mockMediator.Object, _mockApplication.Object, _mockNotification.Object);
             NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand()
             {
                 IncidentId = 1,
@@ -126,11 +138,17 @@ namespace NSG.WebSrv_Tests.Application.Commands
                 Mailed = false,
                 Closed = false,
                 Special = false,
-                Notes = "Notes"
+                Notes = "Notes",
+                User = _user,
+                IncidentNotes = new List<IncidentNoteData>(),
+                DeletedNotes = new List<IncidentNoteData>(),
+                NetworkLogs = new List<NetworkLogData>(),
+                DeletedLogs = new List<NetworkLogData>()
             };
-            Task<int> _updateResults = _handler.Handle(_update, CancellationToken.None);
-            int _count = _updateResults.Result;
-            Assert.AreEqual(1, _count);
+            Task<NetworkIncidentDetailQuery> _updateResults = _handler.Handle(_update, CancellationToken.None);
+            Assert.IsNull(_updateResults.Exception);
+            NetworkIncidentDetailQuery _entity = _updateResults.Result;
+            Assert.AreEqual(_incidentId, _entity.IncidentId);
         }
         //
         [TestMethod]
