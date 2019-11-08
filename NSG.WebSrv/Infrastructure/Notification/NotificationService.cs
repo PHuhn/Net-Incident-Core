@@ -1,6 +1,7 @@
 ﻿//
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Identity.UI.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 //
@@ -13,7 +14,7 @@ namespace NSG.WebSrv.Infrastructure.Notification
     // ASP.NET Core 2.2 - SMTP EmailSender Implementation
     // https://kenhaggerty.com/articles/article/aspnet-core-22-smtp-emailsender-implementation
     //
-    public class NotificationService : INotificationService
+    public class NotificationService : INotificationService, IEmailSender
     {
         //private readonly IHostingEnvironment _env;
         //IHostingEnvironment env,

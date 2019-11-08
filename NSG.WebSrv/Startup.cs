@@ -23,6 +23,7 @@ using NSG.WebSrv.Infrastructure.Notification;
 using NSG.WebSrv.Infrastructure.Common;
 using NSG.WebSrv.Infrastructure.Services;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.UI.Services;
 //
 namespace NSG.WebSrv
 {
@@ -109,6 +110,7 @@ namespace NSG.WebSrv
             services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
             services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IEmailSender, NotificationService>();
             services.AddTransient<IApplication, ApplicationImplementation>();
             //
             services.Configure<RazorViewEngineOptions>(o =>
