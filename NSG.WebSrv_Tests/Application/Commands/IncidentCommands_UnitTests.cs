@@ -68,11 +68,7 @@ namespace NSG.WebSrv_Tests.Application.Commands
             {
                 Console.WriteLine(_iin.IncidentNote.IncidentNoteId.ToString() + " " + _iin.IncidentNote.NoteTypeId.ToString());
             }
-            //.ThenInclude(IncidentIncidentNotes => IncidentIncidentNotes.IncidentNote)
-
         }
-        //
-        // You will need to check that the indexes work with you test data.
         //
         [TestMethod]
         public void NetworkIncidentCreateCommand_Test()
@@ -112,6 +108,34 @@ namespace NSG.WebSrv_Tests.Application.Commands
         }
         //
         [TestMethod]
+        public void NetworkIncidentCreateCommand_PermissionsError_Test()
+        {
+            _testName = "NetworkIncidentCreateCommand_Test";
+            Console.WriteLine($"{_testName} ...");
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(false);
+            NetworkIncidentCreateCommandHandler _handler = new NetworkIncidentCreateCommandHandler(db_context, _mockMediator.Object, _mockApplication.Object);
+            NetworkIncidentCreateCommand _create = new NetworkIncidentCreateCommand();
+            Task<NetworkIncidentDetailQuery> _createResults = _handler.Handle(_create, CancellationToken.None);
+            Assert.IsNotNull(_createResults.Exception);
+            Assert.IsTrue(_createResults.Exception.InnerException is NetworkIncidentCreateCommandPermissionsException);
+            Console.WriteLine(_createResults.Exception.InnerException.Message);
+        }
+        //
+        [TestMethod]
+        public void NetworkIncidentCreateCommand_ValidationError_Test()
+        {
+            _testName = "NetworkIncidentCreateCommand_Test";
+            Console.WriteLine($"{_testName} ...");
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
+            NetworkIncidentCreateCommandHandler _handler = new NetworkIncidentCreateCommandHandler(db_context, _mockMediator.Object, _mockApplication.Object);
+            NetworkIncidentCreateCommand _create = new NetworkIncidentCreateCommand();
+            Task<NetworkIncidentDetailQuery> _createResults = _handler.Handle(_create, CancellationToken.None);
+            Assert.IsNotNull(_createResults.Exception);
+            Assert.IsTrue(_createResults.Exception.InnerException is NetworkIncidentCreateCommandValidationException);
+            Console.WriteLine(_createResults.Exception.InnerException.Message);
+        }
+        //
+        [TestMethod]
         public void NetworkIncidentUpdateCommand_Test()
         {
             _testName = "NetworkIncidentUpdateCommand_Test";
@@ -148,6 +172,22 @@ namespace NSG.WebSrv_Tests.Application.Commands
             Assert.IsNull(_updateResults.Exception);
             NetworkIncidentDetailQuery _entity = _updateResults.Result;
             Assert.AreEqual(_incidentId, _entity.IncidentId);
+        }
+        //
+        [TestMethod]
+        public void NetworkIncidentUpdateCommand_PermissionsError_Test()
+        {
+            // NetworkIncidentUpdateCommandPermissionsException("user not in editable group.");
+            _testName = "NetworkIncidentUpdateCommand_Test";
+            Console.WriteLine($"{_testName} ...");
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(false);
+            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(
+                db_context, _mockMediator.Object, _mockApplication.Object, _mockNotification.Object);
+            NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand();
+            Task<NetworkIncidentDetailQuery> _updateResults = _handler.Handle(_update, CancellationToken.None);
+            Assert.IsNotNull(_updateResults.Exception);
+            Assert.IsTrue(_updateResults.Exception.InnerException is NetworkIncidentUpdateCommandPermissionsException);
+            Console.WriteLine(_updateResults.Exception.InnerException.Message);
         }
         //
         [TestMethod]

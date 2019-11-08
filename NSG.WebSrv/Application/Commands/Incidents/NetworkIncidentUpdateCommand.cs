@@ -82,7 +82,11 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         /// <returns>Returns the row count.</returns>
         public async Task<NetworkIncidentDetailQuery> Handle(NetworkIncidentUpdateCommand request, CancellationToken cancellationToken)
 		{
-			Validator _validator = new Validator();
+            if (_application.IsEditableRole() == false)
+            {
+                throw new NetworkIncidentUpdateCommandPermissionsException("user not in editable group.");
+            }
+            Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
 			if (!_results.IsValid)
 			{
@@ -423,5 +427,22 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		{
 		}
 	}
+    //
+    /// <summary>
+    /// Custom NetworkIncidentUpdateCommand permissions exception.
+    /// </summary>
+    public class NetworkIncidentUpdateCommandPermissionsException : Exception
+    {
+        //
+        /// <summary>
+        /// Implementation of NetworkIncidentUpdateCommand permissions exception.
+        /// </summary>
+        /// <param name="errorMessage">The permissions error messages.</param>
+        public NetworkIncidentUpdateCommandPermissionsException(string errorMessage)
+            : base($"NetworkIncidentUpdateCommand permissions exception: {errorMessage}")
+        {
+        }
+    }
+    //
 }
 // ---------------------------------------------------------------------------

@@ -106,11 +106,14 @@ namespace NSG.WebSrv
             });
             //
             services.AddHttpContextAccessor();
-            // Add framework services.
+            //
+            // Add and configure email/notification services
+            //
             services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
             services.AddSingleton<INotificationService, NotificationService>();
             services.AddSingleton<IEmailSender, NotificationService>();
+            // Add framework services.
             services.AddTransient<IApplication, ApplicationImplementation>();
             //
             services.Configure<RazorViewEngineOptions>(o =>

@@ -78,7 +78,11 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         /// <returns>The Incident entity class.</returns>
         public async Task<NetworkIncidentDetailQuery> Handle(NetworkIncidentCreateCommand request, CancellationToken cancellationToken)
 		{
-			Validator _validator = new Validator();
+            if (_application.IsEditableRole() == false)
+            {
+                throw new NetworkIncidentCreateCommandPermissionsException("user not in editable group.");
+            }
+            Validator _validator = new Validator();
 			ValidationResult _results = _validator.Validate(request);
 			if (!_results.IsValid)
 			{
@@ -95,19 +99,9 @@ namespace NSG.WebSrv.Application.Commands.Incidents
             {
                 // Add the IncidentNotes and link IncidentIncidentNotes
                 AddIncidentNotes(request, _entity);
-                // List<NetworkLogData> networkLogs;
-                // var _networkLogs = new List<NetworkLog>();
-                foreach (NetworkLogData _nld in request.NetworkLogs.Where(_l => _l.Selected == true))
-                {
-                    NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
-                    _networkLog.Incident = _entity;
-                }
-                // List<NetworkLogData> deletedLogs;
-                foreach (NetworkLogData _nld in request.DeletedLogs)
-                {
-                    NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
-                    _context.NetworkLogs.Remove(_networkLog);
-                }
+                await NetworkLogsUpdateAsync(request, _entity);
+                await NetworkLogsDeleteAsync(request, _entity);
+                //
                 await _context.SaveChangesAsync(cancellationToken);
             }
             catch (Exception _ex)
@@ -120,6 +114,12 @@ namespace NSG.WebSrv.Application.Commands.Incidents
             }
             return await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = _entity.IncidentId });
 		}
+        //
+        /// <summary>
+        /// New Incident with request data transferred into it.
+        /// </summary>
+        /// <param name="request">requested NetworkIncidentCreateCommand</param>
+        /// <returns>new Incident with request data</returns>
         Incident CreateIncidentFromRequest(NetworkIncidentCreateCommand request)
         {
             return new Incident
@@ -140,9 +140,10 @@ namespace NSG.WebSrv.Application.Commands.Incidents
         }
         //
         /// <summary>
-        /// 
+        /// Add IncidentNotes to the Incident.
         /// </summary>
-        /// <param name="request"></param>
+        /// <param name="request">requested NetworkIncidentCreateCommand</param>
+        /// <param name="entity">the new Incident with request data</param>
         void AddIncidentNotes(NetworkIncidentCreateCommand request, Incident entity)
         {
             //var _incidentIncidentNotes = new List<IncidentIncidentNote>();
@@ -164,6 +165,46 @@ namespace NSG.WebSrv.Application.Commands.Incidents
                 _context.IncidentIncidentNotes.Add(_incidentIncidentNote);
             }
         }
+        //
+        #region "NetworkLogs processing"
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        async Task NetworkLogsUpdateAsync(NetworkIncidentCreateCommand request, Incident entity)
+        {
+            // List<NetworkLogData> networkLogs;
+            // var _networkLogs = new List<NetworkLog>();
+            foreach (NetworkLogData _nld in request.NetworkLogs.Where(_l => _l.Selected == true))
+            {
+                NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
+                if(_networkLog != null)
+                    _networkLog.Incident = entity;
+            }
+            //
+        }
+        //
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="request"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
+        async Task NetworkLogsDeleteAsync(NetworkIncidentCreateCommand request, Incident entity)
+        {
+            // List<NetworkLogData> deletedLogs;
+            foreach (NetworkLogData _nld in request.DeletedLogs)
+            {
+                NetworkLog _networkLog = await _context.NetworkLogs.FirstOrDefaultAsync(_nl => _nl.NetworkLogId == _nld.NetworkLogId);
+                if(_networkLog != null)
+                    _context.NetworkLogs.Remove(_networkLog);
+            }
+            //
+        }
+        //
+        #endregion // NetworkLogs processing
         //
         /// <summary>
         /// FluentValidation of the 'NetworkIncidentCreateCommand' class.
@@ -216,6 +257,22 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 		{
 		}
 	}
-	//
+    //
+    /// <summary>
+    /// Custom NetworkIncidentCreateCommand permissions exception.
+    /// </summary>
+    public class NetworkIncidentCreateCommandPermissionsException : Exception
+    {
+        //
+        /// <summary>
+        /// Implementation of NetworkIncidentCreateCommand permissions exception.
+        /// </summary>
+        /// <param name="errorMessage">The permissions error messages.</param>
+        public NetworkIncidentCreateCommandPermissionsException(string errorMessage)
+            : base($"NetworkIncidentCreateCommand permissions exception: {errorMessage}")
+        {
+        }
+    }
+    //
 }
 // ---------------------------------------------------------------------------
