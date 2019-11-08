@@ -123,12 +123,11 @@ namespace NSG.WebSrv_Tests.Application.Commands
                 It.IsAny<NetworkIncidentDetailQueryHandler.DetailQuery>(), _cancelToken))
                 .Returns(Task.FromResult(_retModel));
             _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
-            //_notification = notification;
             NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(
                 db_context, _mockMediator.Object, _mockApplication.Object, _mockNotification.Object);
             NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand()
             {
-                IncidentId = 1,
+                IncidentId = _incidentId,
                 ServerId = 1,
                 IPAddress = "11.10.10.10",
                 NIC_Id = "ripe.net",
@@ -149,6 +148,79 @@ namespace NSG.WebSrv_Tests.Application.Commands
             Assert.IsNull(_updateResults.Exception);
             NetworkIncidentDetailQuery _entity = _updateResults.Result;
             Assert.AreEqual(_incidentId, _entity.IncidentId);
+        }
+        //
+        [TestMethod]
+        public void NetworkIncidentUpdateCommand_ValidationError_Test()
+        {
+            _testName = "NetworkIncidentUpdateCommand_Test";
+            Console.WriteLine($"{_testName} ...");
+            long _incidentId = 1;
+            NetworkIncidentDetailQuery _retModel =
+                new NetworkIncidentDetailQuery() { IncidentId = _incidentId };
+            _mockMediator.Setup(x => x.Send(
+                It.IsAny<NetworkIncidentDetailQueryHandler.DetailQuery>(), _cancelToken))
+                .Returns(Task.FromResult(_retModel));
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
+            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(
+                db_context, _mockMediator.Object, _mockApplication.Object, _mockNotification.Object);
+            NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand()
+            {
+                IncidentId = _incidentId,
+                ServerId = 0,
+                IPAddress = "11.10",
+                NIC_Id = "",
+                NetworkName = "",
+                AbuseEmailAddress = "",
+                ISPTicketNumber = "",
+                Mailed = false,
+                Closed = false,
+                Special = false,
+                Notes = "",
+            };
+            Task<NetworkIncidentDetailQuery> _updateResults = _handler.Handle(_update, CancellationToken.None);
+            Assert.IsNotNull(_updateResults.Exception);
+            Assert.IsTrue(_updateResults.Exception.InnerException is NetworkIncidentUpdateCommandValidationException);
+            Console.WriteLine(_updateResults.Exception.InnerException.Message);
+        }
+        //
+        [TestMethod]
+        public void NetworkIncidentUpdateCommand_NotFoundError_Test()
+        {
+            _testName = "NetworkIncidentUpdateCommand_Test";
+            Console.WriteLine($"{_testName} ...");
+            long _incidentId = 9;
+            NetworkIncidentDetailQuery _retModel =
+                new NetworkIncidentDetailQuery() { IncidentId = _incidentId };
+            _mockMediator.Setup(x => x.Send(
+                It.IsAny<NetworkIncidentDetailQueryHandler.DetailQuery>(), _cancelToken))
+                .Returns(Task.FromResult(_retModel));
+            _mockApplication.Setup(x => x.IsEditableRole()).Returns(true);
+            NetworkIncidentUpdateCommandHandler _handler = new NetworkIncidentUpdateCommandHandler(
+                db_context, _mockMediator.Object, _mockApplication.Object, _mockNotification.Object);
+            NetworkIncidentUpdateCommand _update = new NetworkIncidentUpdateCommand()
+            {
+                IncidentId = _incidentId,
+                ServerId = 1,
+                IPAddress = "11.10.10.10",
+                NIC_Id = "ripe.net",
+                NetworkName = "NetworkName",
+                AbuseEmailAddress = "AbuseEmailAddress",
+                ISPTicketNumber = "ISPTicketNumber",
+                Mailed = false,
+                Closed = false,
+                Special = false,
+                Notes = "Notes",
+                User = _user,
+                IncidentNotes = new List<IncidentNoteData>(),
+                DeletedNotes = new List<IncidentNoteData>(),
+                NetworkLogs = new List<NetworkLogData>(),
+                DeletedLogs = new List<NetworkLogData>()
+            };
+            Task<NetworkIncidentDetailQuery> _updateResults = _handler.Handle(_update, CancellationToken.None);
+            Assert.IsNotNull(_updateResults.Exception);
+            Assert.IsTrue(_updateResults.Exception.InnerException is NetworkIncidentUpdateCommandKeyNotFoundException);
+            Console.WriteLine(_updateResults.Exception.InnerException.Message);
         }
         //
         [TestMethod]

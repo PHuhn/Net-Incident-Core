@@ -126,34 +126,12 @@ namespace NSG.WebSrv_Tests.Application.Commands
             {
                 Id = "adm"
             };
-            try
-            {
-                Task<int> _deleteResults = _handler.Handle(_delete, CancellationToken.None);
-                Console.WriteLine(_deleteResults.Status);
-                if (_deleteResults.Exception == null)
-                {
-                    Assert.Fail("should of thrown exception!");
-                }
-                else
-                {
-                    Console.WriteLine(_deleteResults.Exception.Message);
-                    Console.WriteLine(_deleteResults.Exception.InnerException);
-                    if (!(_deleteResults.Exception.InnerException is ApplicationRoleDeleteCommandActiveUsersException))
-                    {
-                        Assert.Fail("should of thrown ApplicationRoleDeleteCommandActiveUsersException!");
-                    }
-                }
-            }
-            catch (ApplicationRoleDeleteCommandActiveUsersException _ex)
-            {
-                Console.WriteLine(_ex.Message);
-                return;
-            }
-            catch( Exception _e )
-            {
-                Console.WriteLine(_e.Message);
-                Assert.Fail("should of thrown ApplicationRoleDeleteCommandActiveUsersException!");
-            }
+            Task<int> _deleteResults = _handler.Handle(_delete, CancellationToken.None);
+            Console.WriteLine(_deleteResults.Status);
+            Assert.IsNotNull(_deleteResults.Exception);
+            Console.WriteLine(_deleteResults.Exception.Message);
+            Console.WriteLine(_deleteResults.Exception.InnerException);
+            Assert.IsTrue(_deleteResults.Exception.InnerException is ApplicationRoleDeleteCommandActiveUsersException);
         }
         //
         [TestMethod]

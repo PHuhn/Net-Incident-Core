@@ -177,7 +177,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 			public Validator()
 			{
 				//
-				RuleFor(x => x.ServerId).NotNull();
+				RuleFor(x => x.ServerId).NotNull().GreaterThan(0);
 				RuleFor(x => x.IPAddress).NotEmpty().MinimumLength(7).MaximumLength(50)
                     .Must(Extensions.ValidateIPv4);
 				RuleFor(x => x.NIC_Id).NotEmpty().MaximumLength(16);

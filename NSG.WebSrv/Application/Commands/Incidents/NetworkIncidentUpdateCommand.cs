@@ -139,7 +139,7 @@ namespace NSG.WebSrv.Application.Commands.Incidents
                 System.Diagnostics.Debug.WriteLine(_ex.ToString());
                 throw (_ex);
             }
-            // Return the row count.
+            //
             return await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = _entity.IncidentId });
         }
         //
@@ -367,10 +367,11 @@ namespace NSG.WebSrv.Application.Commands.Incidents
 			public Validator()
 			{
 				//
-				RuleFor(x => x.IncidentId).NotNull();
-				RuleFor(x => x.ServerId).NotNull();
-				RuleFor(x => x.IPAddress).NotEmpty().MaximumLength(50);
-				RuleFor(x => x.NIC_Id).NotEmpty().MaximumLength(16);
+				RuleFor(x => x.IncidentId).NotNull().GreaterThan(0);
+				RuleFor(x => x.ServerId).NotNull().GreaterThan(0);
+                RuleFor(x => x.IPAddress).NotEmpty().MinimumLength(7).MaximumLength(50)
+                    .Must(Extensions.ValidateIPv4);
+                RuleFor(x => x.NIC_Id).NotEmpty().MaximumLength(16);
 				RuleFor(x => x.NetworkName).MaximumLength(255);
 				RuleFor(x => x.AbuseEmailAddress).MaximumLength(255);
 				RuleFor(x => x.ISPTicketNumber).MaximumLength(50);
