@@ -125,7 +125,7 @@ namespace NSG.WebSrv.UI.Identity.Account.Manage
                 PhoneNumber = Input.PhoneNumber,
                 FirstName = Input.FirstName,
                 LastName = Input.LastName,
-                FullName = Input.FirstName,
+                FullName = Input.FullName,
                 UserNicName = Input.UserNicName
             };
             //
