@@ -1,106 +1,116 @@
-﻿using System;
+﻿//
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using NSG.WebSrv.Application.Commands.Incidents;
+using NSG.WebSrv.Application.Commands.Logs;
 //
 using NSG.WebSrv.Domain.Entities;
 //
 namespace NSG.WebSrv.UI.Api
 {
+    [Authorize]
+    [Authorize(Policy = "AnyUserRole")]
     [Route("api/[controller]")]
     [ApiController]
-    public class NetworkIncidentsController : ControllerBase
+    public class NetworkIncidentsController : BaseApiController
     {
+        //
         private readonly ApplicationDbContext _context;
-
+        //
         public NetworkIncidentsController(ApplicationDbContext context)
         {
             _context = context;
         }
-
-        // GET: api/Incidents
-        [HttpGet]
-        public async Task<ActionResult<IEnumerable<Incident>>> GetIncidents()
-        {
-            return await _context.Incidents.ToListAsync();
-        }
-
+        //
+        
+        //
         // GET: api/Incidents/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Incident>> GetIncident(long id)
+        public async Task<ActionResult<NetworkIncidentDetailQuery>> GetIncident(long? id)
         {
-            var incident = await _context.Incidents.FindAsync(id);
-
-            if (incident == null)
+            if (id == null)
             {
                 return NotFound();
             }
-
-            return incident;
+            NetworkIncidentDetailQuery _results =
+                await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = id.Value });
+            return _results;
         }
 
         // PUT: api/Incidents/5
         [HttpPut("{id}")]
-        public async Task<IActionResult> PutIncident(long id, Incident incident)
+        public async Task<NetworkIncidentDetailQuery> PutIncident(NetworkIncidentUpdateCommand model)
         {
-            if (id != incident.IncidentId)
-            {
-                return BadRequest();
-            }
-
-            _context.Entry(incident).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!IncidentExists(id))
+                if (ModelState.IsValid)
                 {
-                    return NotFound();
+                    NetworkIncidentDetailQuery _ret = await Mediator.Send(model);
+                    return _ret;
                 }
                 else
                 {
-                    throw;
+                    NetworkIncidentDetailQuery _results =
+                        await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = model.IncidentId });
+                    _results.Message = string.Join(", ", ModelState.ToArray());
+                    return _results;
                 }
             }
+            catch (Exception _ex)
+            {
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Error, MethodBase.GetCurrentMethod(),
+                    _ex.Message, _ex));
+                NetworkIncidentDetailQuery _results =
+                    await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = model.IncidentId });
+                _results.Message = _ex.GetBaseException().Message;
+                return _results;
+            }
+        }
 
-            return NoContent();
+        //
+        // GET: api/Incidents/GetEmpty/1
+        [HttpGet("GetEmpty/{id}")]
+        public async Task<ActionResult<NetworkIncidentDetailQuery>> EmptyIncident(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+            NetworkIncidentDetailQuery _results =
+                await Mediator.Send(new NetworkIncidentCreateQueryHandler.DetailQuery() { ServerId = id.Value });
+            return _results;
         }
 
         // POST: api/Incidents
         [HttpPost]
-        public async Task<ActionResult<Incident>> PostIncident(Incident incident)
+        public async Task<ActionResult<NetworkIncidentDetailQuery>> PostIncident(NetworkIncidentCreateCommand model)
         {
-            _context.Incidents.Add(incident);
-            await _context.SaveChangesAsync();
-
-            return CreatedAtAction("GetIncident", new { id = incident.IncidentId }, incident);
-        }
-
-        // DELETE: api/Incidents/5
-        [HttpDelete("{id}")]
-        public async Task<ActionResult<Incident>> DeleteIncident(long id)
-        {
-            var incident = await _context.Incidents.FindAsync(id);
-            if (incident == null)
+            try
             {
-                return NotFound();
+                if (ModelState.IsValid)
+                {
+                    NetworkIncidentDetailQuery _detailIncident = await Mediator.Send(model);
+                    return _detailIncident;
+                }
             }
-
-            _context.Incidents.Remove(incident);
-            await _context.SaveChangesAsync();
-
-            return incident;
+            catch (Exception _ex)
+            {
+                await Mediator.Send(new LogCreateCommand(
+                    LoggingLevel.Error, MethodBase.GetCurrentMethod(),
+                    _ex.Message, _ex));
+            }
+            NetworkIncidentDetailQuery _results =
+                await Mediator.Send(new NetworkIncidentCreateQueryHandler.DetailQuery() { ServerId = model.ServerId });
+            return _results;
         }
-
-        private bool IncidentExists(long id)
-        {
-            return _context.Incidents.Any(e => e.IncidentId == id);
-        }
+        //
     }
 }
