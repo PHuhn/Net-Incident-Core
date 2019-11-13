@@ -195,6 +195,51 @@ namespace NSG.WebSrv_Tests.Application.Commands
         }
         //
         [TestMethod]
+        public async Task ApplicationUserServerDetailQuery_Test()
+        {
+            _testName = "ApplicationUserDetailQuery_Test";
+            Console.WriteLine($"{_testName} ...");
+            ApplicationUserServerDetailQueryHandler.DetailQuery _detailQuery =
+                new ApplicationUserServerDetailQueryHandler.DetailQuery() { UserName = "Phil", ServerShortName = "NSG Memb" };
+            ApplicationUserServerDetailQueryHandler _handler = new ApplicationUserServerDetailQueryHandler(userManager, db_context);
+            ApplicationUserServerDetailQuery _detail =
+                await _handler.Handle(_detailQuery, _cancelToken);
+            Assert.AreEqual(_detailQuery.UserName, _detail.UserName);
+            Assert.AreEqual(_detailQuery.ServerShortName, _detail.ServerShortName);
+            Assert.AreEqual(1, _detail.ServerShortNames.Length);
+        }
+        //
+        [TestMethod]
+        public async Task ApplicationUserServerDetailQuery_EmptyName_Test()
+        {
+            _testName = "ApplicationUserDetailQuery_Test";
+            Console.WriteLine($"{_testName} ...");
+            ApplicationUserServerDetailQueryHandler.DetailQuery _detailQuery =
+                new ApplicationUserServerDetailQueryHandler.DetailQuery() { UserName = "Phil", ServerShortName = "" };
+            ApplicationUserServerDetailQueryHandler _handler = new ApplicationUserServerDetailQueryHandler(userManager, db_context);
+            ApplicationUserServerDetailQuery _detail =
+                await _handler.Handle(_detailQuery, _cancelToken);
+            Assert.AreEqual(_detailQuery.UserName, _detail.UserName);
+            Assert.AreEqual(_detailQuery.ServerShortName, _detail.ServerShortName);
+            Assert.AreEqual(1, _detail.ServerShortNames.Length);
+        }
+        //
+        [TestMethod]
+        public async Task ApplicationUserServerDetailQuery_BadShortName_Test()
+        {
+            _testName = "ApplicationUserDetailQuery_Test";
+            Console.WriteLine($"{_testName} ...");
+            ApplicationUserServerDetailQueryHandler.DetailQuery _detailQuery =
+                new ApplicationUserServerDetailQueryHandler.DetailQuery() { UserName = "Phil", ServerShortName = "xxx" };
+            ApplicationUserServerDetailQueryHandler _handler = new ApplicationUserServerDetailQueryHandler(userManager, db_context);
+            ApplicationUserServerDetailQuery _detail =
+                await _handler.Handle(_detailQuery, _cancelToken);
+            Assert.AreEqual(_detailQuery.UserName, _detail.UserName);
+            Assert.AreEqual("", _detail.ServerShortName);
+            Assert.AreEqual(1, _detail.ServerShortNames.Length);
+        }
+        //
+        [TestMethod]
         public void ApplicationUserListQuery_Test()
         {
             _testName = "ApplicationUserListQuery_Test";

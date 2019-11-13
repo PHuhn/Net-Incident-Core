@@ -4,6 +4,7 @@ using System.Text;
 //
 using NSG.WebSrv.Domain.Entities;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using NSG.WebSrv.Application.Commands.Incidents;
 //
 namespace NSG.WebSrv.Application.Commands.Servers
 {
@@ -41,6 +42,33 @@ namespace NSG.WebSrv.Application.Commands.Servers
             else
                 _return.AppendFormat("/DST_End/]");
             return _return.ToString();
+        }
+        //
+        /// <summary>
+        /// Extension method that translates from Server to ServerData.
+        /// </summary>
+        /// <param name="entity">The Server entity class.</param>
+        /// <returns>'ServerData' or Server detail query.</returns>
+        public static ServerData ToServerData(this Server entity)
+        {
+            return new ServerData
+            {
+                ServerId = entity.ServerId,
+                CompanyId = entity.CompanyId,
+                ServerShortName = entity.ServerShortName,
+                ServerName = entity.ServerName,
+                ServerDescription = entity.ServerDescription,
+                WebSite = entity.WebSite,
+                ServerLocation = entity.ServerLocation,
+                FromName = entity.FromName,
+                FromNicName = entity.FromNicName,
+                FromEmailAddress = entity.FromEmailAddress,
+                TimeZone = entity.TimeZone,
+                DST = entity.DST,
+                TimeZone_DST = entity.TimeZone_DST,
+                DST_Start = entity.DST_Start,
+                DST_End = entity.DST_End,
+            };
         }
         //
     }
