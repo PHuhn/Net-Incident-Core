@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
@@ -14,6 +15,10 @@ using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity.UI.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.Extensions.Options;
 //
 using FluentValidation.AspNetCore;
 using MediatR;
@@ -22,8 +27,8 @@ using NSG.WebSrv.Domain.Entities;
 using NSG.WebSrv.Infrastructure.Notification;
 using NSG.WebSrv.Infrastructure.Common;
 using NSG.WebSrv.Infrastructure.Services;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity.UI.Services;
+using NSG.WebSrv.Infrastructure.Authentication;
+using System.IdentityModel.Tokens.Jwt;
 //
 namespace NSG.WebSrv
 {
@@ -50,6 +55,8 @@ namespace NSG.WebSrv
         /// The configured logger (console).
         /// </summary>
         public static ILogger<ConsoleLoggerProvider> AppLogger = null;
+        private object options;
+
         //
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -64,6 +71,14 @@ namespace NSG.WebSrv
             AppLogger = LoggerFactory.CreateLogger<ConsoleLoggerProvider>();
             services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
             services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(Logger<>)));
+            // Add and configure email/notification services
+            services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
+            services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
+            // services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
+            AuthSettings _authSettings = new AuthSettings();
+            _authSettings = Options.Create<AuthSettings>(
+                Configuration.GetSection("AuthSettings").Get<AuthSettings>()).Value;
+            services.AddSingleton<AuthSettings>(_authSettings);
             //
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -82,6 +97,50 @@ namespace NSG.WebSrv
             // call services.AddIdentity<ApplicationUser, ApplicationRole>()
             services.AddApplicationIdentity();
             //
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("AdminRole", policy => policy.RequireRole("Admin"));
+                options.AddPolicy("CompanyAdminRole", policy => policy.RequireRole("Admin", "CompanyAdmin"));
+                options.AddPolicy("AnyUserRole", policy => policy.RequireRole("User", "Admin", "CompanyAdmin"));
+                Console.WriteLine(options);
+            });
+            //
+            services.AddHttpContextAccessor();
+            // JWT Authentication
+            JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // clear defaults
+            services.AddAuthentication(options =>
+            {
+                //
+                // options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                //
+            })
+            .AddCookie(cfg => cfg.SlidingExpiration = true)
+            .AddJwtBearer(options =>
+            {
+                //
+                options.RequireHttpsMetadata = false;
+                options.SaveToken = true;
+                options.TokenValidationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.JwtSecret)),
+                    ValidIssuer = _authSettings.JwtIssuer,
+                    ValidAudience = _authSettings.JwtAudience,
+                    ClockSkew = TimeSpan.Zero, // remove expire delay
+                    ValidateIssuer = false,
+                    ValidateAudience = false
+                };
+            });
+            //
+            // Add email/notification services
+            //
+            services.AddSingleton<INotificationService, NotificationService>();
+            services.AddSingleton<IEmailSender, NotificationService>();
+            // Add framework services.
+            services.AddTransient<IApplication, ApplicationImplementation>();
+            //
             services.AddMvc()
                 .AddApplicationPart(typeof(Startup).Assembly)
                 .SetCompatibilityVersion(CompatibilityVersion.Version_2_2)
@@ -96,25 +155,6 @@ namespace NSG.WebSrv
                     //options.Conventions.AuthorizeAreaFolder("Identity", "/Account/Manage");
                     //options.Conventions.AuthorizeAreaPage("Identity", "/Account/Logout");
                 });
-            //
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("AdminRole", policy => policy.RequireRole("Admin"));
-                options.AddPolicy("CompanyAdminRole", policy => policy.RequireRole("Admin", "CompanyAdmin"));
-                options.AddPolicy("AnyUserRole", policy => policy.RequireRole("User", "Admin", "CompanyAdmin"));
-                Console.WriteLine(options);
-            });
-            //
-            services.AddHttpContextAccessor();
-            //
-            // Add and configure email/notification services
-            //
-            services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
-            services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
-            services.AddSingleton<INotificationService, NotificationService>();
-            services.AddSingleton<IEmailSender, NotificationService>();
-            // Add framework services.
-            services.AddTransient<IApplication, ApplicationImplementation>();
             //
             services.Configure<RazorViewEngineOptions>(o =>
             {

@@ -124,6 +124,8 @@ namespace NSG.WebSrv.Application.Commands.ApplicationUsers
             _return.AppendFormat("PhoneNumber: {0}, ", PhoneNumber);
             _return.AppendFormat("PhoneNumberConfirmed: {0}, ", PhoneNumberConfirmed.ToString());
             _return.AppendFormat("ServerShortName: {0}, ", ServerShortName);
+            if( Roles != null )
+                _return.AppendFormat("Roles: {0}, ", string.Join(", ", Roles));
             return _return.ToString();
             //
         }

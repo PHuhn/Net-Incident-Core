@@ -1,17 +1,14 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
-using System.Linq;
-using System.Collections.Generic;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Options;
-//
-using Moq;
-using NSG.WebSrv.UI.Api;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 //
+using Moq;
+//
+using NSG.WebSrv.UI.Api;
 using NSG.WebSrv.Infrastructure.Services;
-using Microsoft.AspNetCore.Mvc;
 //
 namespace NSG.WebSrv_Tests.Api
 {
