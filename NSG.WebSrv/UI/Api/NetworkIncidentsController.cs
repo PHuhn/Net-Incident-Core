@@ -22,16 +22,23 @@ namespace NSG.WebSrv.UI.Api
     public class NetworkIncidentsController : BaseApiController
     {
         //
-        private readonly ApplicationDbContext _context;
-        //
-        public NetworkIncidentsController(ApplicationDbContext context)
+        /// <summary>
+        /// NetworkIncidents controller parameterless constructor
+        /// All parameters are handled by IMediator from the base BaseApiController;
+        /// </summary>
+        public NetworkIncidentsController( )
         {
-            _context = context;
         }
         //
-        
+        //  GetIncident(long? id)
         //
-        // GET: api/Incidents/5
+        #region "Network Incident get"
+        //
+        /// <summary>
+        /// GET: api/Incidents/5
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
         [HttpGet("{id}")]
         public async Task<ActionResult<NetworkIncidentDetailQuery>> GetIncident(long? id)
         {
@@ -43,8 +50,18 @@ namespace NSG.WebSrv.UI.Api
                 await Mediator.Send(new NetworkIncidentDetailQueryHandler.DetailQuery() { IncidentId = id.Value });
             return _results;
         }
-
-        // PUT: api/Incidents/5
+        //
+        #endregion // Network Incident get
+        //
+        //  PutIncident(NetworkIncidentUpdateCommand model)
+        //
+        #region "Network Incident update"
+        //
+        /// <summary>
+        /// PUT: api/Incidents/
+        /// </summary>
+        /// <param name="model">update model</param>
+        /// <returns>same incident</returns>
         [HttpPut("{id}")]
         public async Task<NetworkIncidentDetailQuery> PutIncident(NetworkIncidentUpdateCommand model)
         {
@@ -74,9 +91,19 @@ namespace NSG.WebSrv.UI.Api
                 return _results;
             }
         }
-
         //
-        // GET: api/Incidents/GetEmpty/1
+        #endregion // Network Incident update
+        //
+        //  EmptyIncident(int id) // server id
+        //  PostIncident(NetworkIncidentCreateCommand model)
+        //
+        #region "Network Incident Create"
+        //
+        /// <summary>
+        /// GET: api/Incidents/GetEmpty/1
+        /// </summary>
+        /// <param name="id">server id</param>
+        /// <returns></returns>
         [HttpGet("GetEmpty/{id}")]
         public async Task<ActionResult<NetworkIncidentDetailQuery>> EmptyIncident(int? id)
         {
@@ -88,7 +115,6 @@ namespace NSG.WebSrv.UI.Api
                 await Mediator.Send(new NetworkIncidentCreateQueryHandler.DetailQuery() { ServerId = id.Value });
             return _results;
         }
-
         // POST: api/Incidents
         [HttpPost]
         public async Task<ActionResult<NetworkIncidentDetailQuery>> PostIncident(NetworkIncidentCreateCommand model)
@@ -111,6 +137,8 @@ namespace NSG.WebSrv.UI.Api
                 await Mediator.Send(new NetworkIncidentCreateQueryHandler.DetailQuery() { ServerId = model.ServerId });
             return _results;
         }
+        //
+        #endregion // Network Incident Create
         //
     }
 }

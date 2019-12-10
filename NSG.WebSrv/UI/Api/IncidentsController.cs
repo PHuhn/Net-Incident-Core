@@ -18,16 +18,21 @@ namespace NSG.WebSrv.UI.Api
     [ApiController]
     public class IncidentsController : BaseApiController
     {
-        private readonly ApplicationDbContext _context;
-
-        public IncidentsController(ApplicationDbContext context)
-        {
-            _context = context;
-        }
-
-        // GET: api/Incidents
+        //
         /// <summary>
-        /// 
+        /// Incidents controller parameterless constructor
+        /// All parameters are handled by IMediator from the base BaseApiController;
+        /// </summary>
+        public IncidentsController()
+        {
+        }
+        //
+        //  GetIncidents([FromQuery(Name = "lazyLoadEvent")]string lazyLoadEvent)
+        //
+        #region"Incident list"
+        //
+        /// <summary>
+        /// GET: api/Incidents
         /// Example:
         /// /api/incidents?lazyLoadEvent={"first":0,"rows":3,"filters":{"ServerId":{"value":1,"matchMode":"equals"},"Mailed":{"value":false,"matchMode":"equals"}}}
         /// </summary>
@@ -41,7 +46,11 @@ namespace NSG.WebSrv.UI.Api
             return _incidentViewModel;
         }
         //
-        #region "Delete"
+        #endregion // Incident list
+        //
+        //  DeleteIncident(long id)
+        //
+        #region "Incident Delete"
         //
         /// <summary>
         /// DELETE: api/Incidents/5
