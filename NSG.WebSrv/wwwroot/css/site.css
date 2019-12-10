@@ -66,6 +66,7 @@ body {
 dt, label {
     color: navy;
     font-weight: bold;
+    padding-right: 5px;
 }
 /* .validation-summary-errors */
 .nsg-msg-alerts {
@@ -193,6 +194,7 @@ nsg-alerts-msg-ul {
     text-overflow: ellipsis;
     white-space: nowrap;
     font-weight: bold;
+    padding-right: 5px;
 }
 
 @media (max-width: 768px) {
