@@ -107,32 +107,26 @@ namespace NSG.WebSrv
             //
             services.AddHttpContextAccessor();
             // JWT Authentication
+            // https://stackoverflow.com/questions/56093946/how-can-i-implement-cookie-base-authentication-and-jwt-in-asp-net-core-2-2
             JwtSecurityTokenHandler.DefaultInboundClaimTypeMap.Clear(); // clear defaults
-            services.AddAuthentication(options =>
-            {
-                //
-                // options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-                // options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
-                // options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-                //
-            })
-            .AddCookie(cfg => cfg.SlidingExpiration = true)
-            .AddJwtBearer(options =>
-            {
-                //
-                options.RequireHttpsMetadata = false;
-                options.SaveToken = true;
-                options.TokenValidationParameters = new TokenValidationParameters
+            services.AddAuthentication()
+                .AddCookie(cfg => cfg.SlidingExpiration = true)
+                .AddJwtBearer(options =>
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.JwtSecret)),
-                    ValidIssuer = _authSettings.JwtIssuer,
-                    ValidAudience = _authSettings.JwtAudience,
-                    ClockSkew = TimeSpan.Zero, // remove expire delay
-                    ValidateIssuer = false,
-                    ValidateAudience = false
-                };
-            });
+                    //
+                    options.RequireHttpsMetadata = false;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(_authSettings.JwtSecret)),
+                        ValidIssuer = _authSettings.JwtIssuer,
+                        ValidAudience = _authSettings.JwtAudience,
+                        ClockSkew = TimeSpan.Zero, // remove expire delay
+                        ValidateIssuer = false,
+                        ValidateAudience = false
+                    };
+                });
             //
             // Add email/notification services
             //
