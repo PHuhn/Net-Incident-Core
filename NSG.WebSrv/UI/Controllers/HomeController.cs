@@ -37,6 +37,8 @@ namespace NSG.WebSrv.UI.Controllers
         //
         public IActionResult Privacy()
         {
+            ViewBag.ApplicationName = _application.GetApplicationName();
+            ViewBag.ApplicationPhone = _application.GetApplicationPhoneNumber();
             return View();
         }
         //
@@ -83,6 +85,14 @@ namespace NSG.WebSrv.UI.Controllers
                 UserClaimsPrincipal = Base_GetUserAccount()
             };
             return View(_model);
+        }
+        //
+        public ActionResult Process()
+        {
+            ViewBag.Title = "Current Process";
+            ViewBag.Process =
+                System.Diagnostics.Process.GetCurrentProcess();
+            return View();
         }
         //
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

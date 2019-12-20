@@ -14,6 +14,12 @@ namespace NSG.WebSrv.Infrastructure.Common
         string GetApplicationName();
         //
         /// <summary>
+        /// Return a string of the Application Name.
+        /// </summary>
+        /// <returns>string of Application phone #</returns>
+        string GetApplicationPhoneNumber();
+        //
+        /// <summary>
         /// Return a date-time of the current date/time.
         /// </summary>
         /// <returns>DateTime of the current date/time.</returns>

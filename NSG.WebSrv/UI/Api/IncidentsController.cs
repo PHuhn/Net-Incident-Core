@@ -14,6 +14,8 @@ using System.Reflection;
 //
 namespace NSG.WebSrv.UI.Api
 {
+    [Authorize]
+    [Authorize(Policy = "AnyUserRole")]
     [Route("api/[controller]")]
     [ApiController]
     public class IncidentsController : BaseApiController

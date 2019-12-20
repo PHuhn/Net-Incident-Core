@@ -2,18 +2,18 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <UserSecretsId>aspnet-NSG.WebSrv7-81B1308F-2C3F-436B-A016-9476C8C160FD</UserSecretsId>
     <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
+    <UserSecretsId>aspnet-NSG.WebSrv7-81B1308F-2C3F-436B-A016-9476C8C160FD</UserSecretsId>
     <RootNamespace>NSG.WebSrv</RootNamespace>
     <AssemblyName>NSG.WebSrv</AssemblyName>
-    <Version>1.2.0.1</Version>
+    <!-- Version <core>.<major>.<minor>.<build> -->
+    <Version>2.3.1.0</Version>
     <Copyright>Copyright © 2019</Copyright>
     <Company>Northern Software Group</Company>
     <Authors>Phil Huhn (NSG)</Authors>
     <Description>Backend and administration to Network Incident</Description>
     <Product>Network Incident Backend</Product>
   </PropertyGroup>
-
   <ItemGroup>
     <Compile Remove="Domain\Entities\Migrations\20190706014441_Update-2019-07-05-v02.cs" />
     <Compile Remove="Domain\Entities\Migrations\20190706014441_Update-2019-07-05-v02.Designer.cs" />
@@ -30,6 +30,8 @@
     <PackageReference Include="FluentValidation" Version="8.4.0" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="8.4.0" />
     <PackageReference Include="MailKit" Version="2.3.2" />
+    <PackageReference Include="NetCore.MailKit" Version="2.0.2" />
+    <PackageReference Include="SendGrid" Version="9.12.0" />
     <PackageReference Include="MediatR" Version="7.0.0" />
     <PackageReference Include="MediatR.Extensions.Microsoft.DependencyInjection" Version="7.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
@@ -37,10 +39,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.2.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.2.3" />
-    <PackageReference Include="MimeKit" Version="2.3.2" />
-    <PackageReference Include="NetCore.MailKit" Version="2.0.2" />
     <PackageReference Include="OdeToCode.AddFeatureFolders" Version="2.0.3" />
-    <PackageReference Include="SendGrid" Version="9.12.0" />
   </ItemGroup>
 
 
@@ -54,6 +53,13 @@
     <ProjectReference Include="..\..\..\Ng\NSG.MimeKit\NSG.MimeKit.Extensions\NSG.MimeKit.Extensions.csproj" />
     <ProjectReference Include="..\..\..\Ng\NSG.MimeKit\NSG.MimeKit.SendGrid.Extensions\NSG.MimeKit.SendGrid.Extensions.csproj" />
     <ProjectReference Include="..\..\..\Ng\NSG.PrimeNG\NSG.PrimeNG.LazyLoading\NSG.PrimeNG.LazyLoading.csproj" />
+  </ItemGroup>
+
+
+  <ItemGroup>
+    <Content Update="web.config">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

@@ -55,12 +55,16 @@ namespace NSG.WebSrv
         /// The configured logger (console).
         /// </summary>
         public static ILogger<ConsoleLoggerProvider> AppLogger = null;
-        private object options;
-
         //
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //
+            services.Configure<IISServerOptions>(options =>
+            {
+                // do not use windows authentication
+                options.AutomaticAuthentication = false;
+            });
             // Configure logging
             // Unable to resolve service for type 'Microsoft.Extensions.Logging.ILogger' while attempting to activate 'NSG.WebSrv.Infrastructure.Notification.NotificationService'
             services.AddLogging(builder => builder
@@ -74,6 +78,7 @@ namespace NSG.WebSrv
             // Add and configure email/notification services
             services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
+            services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             // services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
             AuthSettings _authSettings = new AuthSettings();
             _authSettings = Options.Create<AuthSettings>(
@@ -181,7 +186,10 @@ namespace NSG.WebSrv
                 o.AreaPageViewLocationFormats.Add("/UI/Identity/Account/Manage/{0}" + RazorViewEngine.ViewExtension);
                 Console.WriteLine(o);
             });
-            services.AddSession();
+            services.AddSession(options =>
+            {
+                options.Cookie.IsEssential = true;
+            });
         }
         //
         /// <summary>

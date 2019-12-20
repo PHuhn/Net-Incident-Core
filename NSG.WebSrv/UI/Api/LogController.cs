@@ -8,7 +8,7 @@ using NSG.WebSrv.Application.Commands.Logs;
 //
 namespace NSG.WebSrv.UI.Api
 {
-    // Authorize
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class LogController : BaseApiController

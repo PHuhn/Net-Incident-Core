@@ -3,6 +3,7 @@ using System;
 using System.Security.Claims;
 //
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Options;
 //
 namespace NSG.WebSrv.Infrastructure.Common
 {
@@ -10,6 +11,7 @@ namespace NSG.WebSrv.Infrastructure.Common
     {
         //
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ApplicationSettings _applicationSettings;
         //
         // https://docs.microsoft.com/en-us/aspnet/core/fundamentals/http-context?view=aspnetcore-2.2
         /// <summary>
@@ -18,9 +20,10 @@ namespace NSG.WebSrv.Infrastructure.Common
         ///     services.AddTransient<IUserRepository, UserRepository>();
         /// </summary>
         /// <param name="httpContextAccessor"></param>
-        public ApplicationImplementation(IHttpContextAccessor httpContextAccessor)
+        public ApplicationImplementation(IHttpContextAccessor httpContextAccessor, IOptions<ApplicationSettings> applicationSettings)
         {
             _httpContextAccessor = httpContextAccessor;
+            _applicationSettings = applicationSettings.Value;
         }
         //
         /// <summary>
@@ -29,7 +32,16 @@ namespace NSG.WebSrv.Infrastructure.Common
         /// <returns>string of Application Name</returns>
         public string GetApplicationName()
         {
-            return "WebSrv Identity";
+            return _applicationSettings.Name;
+        }
+        //
+        /// <summary>
+        /// Return a string of the Application Name.
+        /// </summary>
+        /// <returns>string of Application phone #</returns>
+        public string GetApplicationPhoneNumber()
+        {
+            return _applicationSettings.Phone;
         }
         //
         /// <summary>

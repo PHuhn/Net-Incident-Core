@@ -15,8 +15,8 @@ namespace NSG.WebSrv.UI.Api
     //
     // -----------------------------------------------------------------------
     //
-    // -Authorize(Policy = "AnyUserRole")
-    // -Authorize
+    [Authorize]
+    [Authorize(Policy = "AnyUserRole")]
     [ApiController]
     [Route("api/[controller]")]
     public class ServicesController : BaseApiController
