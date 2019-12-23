@@ -60,13 +60,34 @@ namespace NSG.WebSrv
         public void ConfigureServices(IServiceCollection services)
         {
             //
+            // Web-site options:
+            // * IIS options,
+            // * Cookie options.
+            //
             services.Configure<IISServerOptions>(options =>
             {
                 // do not use windows authentication
                 options.AutomaticAuthentication = false;
             });
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
+                options.CheckConsentNeeded = context => true;
+                options.MinimumSameSitePolicy = SameSiteMode.None;
+            });
+            services.ConfigureApplicationCookie(options =>
+            {
+                // Cookie settings
+                options.Cookie.HttpOnly = true;
+                options.ExpireTimeSpan = TimeSpan.FromMinutes(120);
+                options.LoginPath = "/Account/Login";
+                options.AccessDeniedPath = "/Account/AccessDenied";
+                options.SlidingExpiration = true;
+            });
+            //
             // Configure logging
             // Unable to resolve service for type 'Microsoft.Extensions.Logging.ILogger' while attempting to activate 'NSG.WebSrv.Infrastructure.Notification.NotificationService'
+            //
             services.AddLogging(builder => builder
                 .AddConfiguration(Configuration.GetSection("Logging"))
                 .AddConsole()
@@ -74,27 +95,25 @@ namespace NSG.WebSrv
             );
             AppLogger = LoggerFactory.CreateLogger<ConsoleLoggerProvider>();
             services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
-            services.TryAdd(ServiceDescriptor.Singleton(typeof(ILogger<>), typeof(Logger<>)));
-            // Add and configure email/notification services
+            //
+            // Read values from the 'appsettings.json'
+            // * Add and configure email/notification services
+            // * Services like ping/whois
+            // * Applications information line name and phone #
+            // * Various authorization information
+            //
             services.Configure<MimeKit.NSG.EmailSettings>(Configuration.GetSection("EmailSettings"));
             services.Configure<ServicesSettings>(Configuration.GetSection("ServicesSettings"));
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
-            // services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
-            AuthSettings _authSettings = new AuthSettings();
-            _authSettings = Options.Create<AuthSettings>(
+            AuthSettings _authSettings = Options.Create<AuthSettings>(
                 Configuration.GetSection("AuthSettings").Get<AuthSettings>()).Value;
             services.AddSingleton<AuthSettings>(_authSettings);
             //
-            services.Configure<CookiePolicyOptions>(options =>
-            {
-                // This lambda determines whether user consent for non-essential cookies is needed for a given request.
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
-            });
             // Add MediatR from MediatR.Extensions.Microsoft.DependencyInjection package
             services.AddMediatR(System.Reflection.Assembly.GetExecutingAssembly());
             // overridable
             ConfigureDatabase(services);
+            //
             services.AddScoped<IDb_Context, ApplicationDbContext>();
             // inject HttpContext accessor into controller
             services.TryAddSingleton<IHttpContextAccessor, HttpContextAccessor>();
