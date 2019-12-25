@@ -49,6 +49,13 @@ namespace NSG.WebSrv.UI.Controllers
         //
         public IActionResult TestAlerts()
         {
+            var _about = new AboutViewModel();
+            ViewBag.Version = _about.Version;
+            ViewBag.Process =
+                System.Diagnostics.Process.GetCurrentProcess();
+            //
+            // display sample messages
+            //
             Error("Error message...");
             Warning("Warning message...");
             Success("Success message...");
@@ -79,20 +86,16 @@ namespace NSG.WebSrv.UI.Controllers
         //
         public ActionResult TestUser()
         {
-            var _model = new TestUserViewModel()
+            TestUserViewModel _model = new TestUserViewModel();
+            if ( User.Identity.IsAuthenticated )
             {
-                UserHttpContext = _application.GetUserAccount(),
-                UserClaimsPrincipal = Base_GetUserAccount()
-            };
+                _model = new TestUserViewModel()
+                {
+                    UserHttpContext = _application.GetUserAccount(),
+                    UserClaimsPrincipal = Base_GetUserAccount()
+                };
+            }
             return View(_model);
-        }
-        //
-        public ActionResult Process()
-        {
-            ViewBag.Title = "Current Process";
-            ViewBag.Process =
-                System.Diagnostics.Process.GetCurrentProcess();
-            return View();
         }
         //
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]

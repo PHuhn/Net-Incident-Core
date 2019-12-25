@@ -1,5 +1,15 @@
 ﻿@{
     ViewData["Title"] = "Test Alerts";
 }
-<h2>@ViewData["Title"]</h2>
-<h4>Testing Version: 2.0.0.0 </h4>
+<div class="jumbotron">
+    <h2>@ViewData["Title"]</h2>
+    <br />
+    <div class="row">
+        <div class='col-md-3 nsg-label'><label for='applicationVersion'>Testing Version: </label></div>
+        <div id='applicationVersion' class='col-md-9'>@ViewBag.Version</div>
+    </div>
+    <div class="row">
+        <div class='col-md-3 nsg-label'><label for='applicationProcess'>Back-end Process: </label></div>
+        <div id='applicationProcess' class='col-md-9'>@ViewBag.Process</div>
+    </div>
+</div>

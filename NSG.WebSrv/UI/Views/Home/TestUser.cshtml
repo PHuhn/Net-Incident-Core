@@ -2,7 +2,15 @@
 @{
     ViewData["Title"] = "MyUser";
 }
-<h3>Test User</h3>
-<p>User (HttpContext): @Model.UserHttpContext</p>
-<p>User (ClaimsPrincipal): @Model.UserClaimsPrincipal</p>
-
+<div class="jumbotron">
+    <h2>Test User</h2>
+    <br />
+    <div class="row">
+        <div class='col-md-3 nsg-label'><label for='HttpContext'>User (HttpContext):</label></div>
+        <div id='HttpContext' class='col-md-9'>@Model.UserHttpContext</div>
+    </div>
+    <div class="row">
+        <div class='col-md-3 nsg-label'><label for='ClaimsPrincipal'>User (ClaimsPrincipal): </label></div>
+        <div id='ClaimsPrincipal' class='col-md-9'>@Model.UserClaimsPrincipal</div>
+    </div>
+</div>

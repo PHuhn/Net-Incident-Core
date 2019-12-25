@@ -29,16 +29,17 @@ using NSG.WebSrv.Infrastructure.Common;
 using NSG.WebSrv.Infrastructure.Services;
 using NSG.WebSrv.Infrastructure.Authentication;
 using System.IdentityModel.Tokens.Jwt;
+using System.Reflection;
 //
 namespace NSG.WebSrv
 {
     public class Startup
     {
         //
-        public Startup(IConfiguration configuration, ILoggerFactory loggerFactory)
+        public Startup(IConfiguration configuration, ILogger<Startup> logger)
         {
             Configuration = configuration;
-            LoggerFactory = loggerFactory;
+            _logger = logger;
         }
         //
         /// <summary>
@@ -49,12 +50,13 @@ namespace NSG.WebSrv
         /// <summary>
         /// The logger factory
         /// </summary>
-        public static ILoggerFactory LoggerFactory = null;
+        ILogger<Startup> _logger;
+        // public static ILoggerFactory LoggerFactory = null;
         //
         /// <summary>
         /// The configured logger (console).
         /// </summary>
-        public static ILogger<ConsoleLoggerProvider> AppLogger = null;
+        // public static ILogger<ConsoleLoggerProvider> AppLogger = null;
         //
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -93,8 +95,8 @@ namespace NSG.WebSrv
                 .AddConsole()
                 .AddDebug()
             );
-            AppLogger = LoggerFactory.CreateLogger<ConsoleLoggerProvider>();
-            services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
+            // AppLogger = LoggerFactory.CreateLogger<ConsoleLoggerProvider>();
+            // services.TryAdd(ServiceDescriptor.Singleton<ILoggerFactory, LoggerFactory>());
             //
             // Read values from the 'appsettings.json'
             // * Add and configure email/notification services
@@ -107,10 +109,18 @@ namespace NSG.WebSrv
             services.Configure<ApplicationSettings>(Configuration.GetSection("ApplicationSettings"));
             AuthSettings _authSettings = Options.Create<AuthSettings>(
                 Configuration.GetSection("AuthSettings").Get<AuthSettings>()).Value;
-            services.AddSingleton<AuthSettings>(_authSettings);
+            services.Configure<AuthSettings>(Configuration.GetSection("AuthSettings"));
             //
             // Add MediatR from MediatR.Extensions.Microsoft.DependencyInjection package
-            services.AddMediatR(System.Reflection.Assembly.GetExecutingAssembly());
+            var _assembly = typeof(Startup).GetTypeInfo().Assembly;
+            //System.Reflection.Assembly.GetExecutingAssembly();
+            if ( _assembly != null )
+                _logger.LogWarning("Assemble loc: {0}", _assembly.Location);
+            else
+                _logger.LogWarning("Assemble loc: //");
+            services.AddMediatR(Assembly.GetExecutingAssembly());
+            //services.AddMediatR(typeof(Startup).GetTypeInfo().Assembly);
+            //services.AddMediatR(_assembly);
             // overridable
             ConfigureDatabase(services);
             //
@@ -219,9 +229,13 @@ namespace NSG.WebSrv
         /// </param>
         public virtual void ConfigureDatabase(IServiceCollection services)
         {
+            string _connetionString = Configuration.GetConnectionString("DefaultConnection");
+            if( string.IsNullOrEmpty(_connetionString))
+            {
+                throw (new ApplicationException("no connection string found"));
+            }
             services.AddDbContext<ApplicationDbContext>(options =>
-                options.UseSqlServer(
-                    Configuration.GetConnectionString("DefaultConnection")));
+                options.UseSqlServer(_connetionString));
         }
         //
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
