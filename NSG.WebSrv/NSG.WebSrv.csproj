@@ -7,7 +7,7 @@
     <RootNamespace>NSG.WebSrv</RootNamespace>
     <AssemblyName>NSG.WebSrv</AssemblyName>
     <!-- Version <core>.<major>.<minor>.<build> -->
-    <Version>2.3.1.0</Version>
+    <Version>2.3.1.1</Version>
     <Copyright>Copyright © 2019</Copyright>
     <Company>Northern Software Group</Company>
     <Authors>Phil Huhn (NSG)</Authors>
